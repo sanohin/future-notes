@@ -12,6 +12,7 @@ using AutoMapper;
 using notes.Helpers;
 using notes.Services;
 using Microsoft.EntityFrameworkCore;
+using notes.Data;
 
 namespace notes
 {

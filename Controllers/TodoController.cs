@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using notes.Entities;
 using notes.Helpers;
+using notes.Data;
 
 namespace notes.Controllers
 {

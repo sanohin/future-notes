@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using notes.Entities;
 
-namespace notes.Helpers
+namespace notes.Data
 {
     public class DataContext : DbContext
     {
