@@ -1,16 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { Textarea, TextInputField, Button, Pane, Heading } from 'evergreen-ui';
+import { TextInputField, Button, Pane, Heading } from 'evergreen-ui';
+import { AuthContext } from '../auth';
 import { Wrapper } from './Wrapper';
+import { logIn } from '../../api';
 
 export const Login = () => {
   const [user, changeUser] = useState('');
   const [pass, changePass] = useState('');
+  const ctx = useContext(AuthContext);
+  const login = e => {
+    e.preventDefault();
+    logIn({ userName: user, password: pass }).then(res => {
+      if (res) {
+        ctx.setToken(res.token);
+      }
+    });
+  };
   return (
     <Wrapper>
       <Heading size={700}>Log in</Heading>
       <Pane marginTop={16}>
-        <form onSubmit={e => e.preventDefault()}>
+        <form onSubmit={login}>
           <TextInputField
             required
             autoFocus

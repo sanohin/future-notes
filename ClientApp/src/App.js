@@ -1,34 +1,30 @@
 import React, { useState } from 'react';
-import { Route, Switch } from 'react-router';
+import { Switch } from 'react-router';
 import { NavMenu } from './components/NavMenu';
 import { Home } from './components/Home';
-import { FetchData } from './components/FetchData';
-import { Counter } from './components/Counter';
 import { Login, SignUp } from './components/login';
-import { AuthContext, PrivateRoute } from './components/auth';
-
-const getInitialToken = () => localStorage.getItem('jwt-token');
-const setInitialToken = next => localStorage.setItem('jwt-token', next);
+import { AuthContext, PrivateRoute, NotLoggedInRoute } from './components/auth';
+import { getSavedToken, saveToken } from './components/auth/utils';
+import { updateAxiosToken } from './api';
 
 export const App = () => {
-  const [token, updateToken] = useState(getInitialToken());
+  const [token, updateToken] = useState(getSavedToken());
   return (
     <AuthContext.Provider
       value={{
         token,
         setToken: next => {
           updateToken(next);
-          setInitialToken(next);
+          saveToken(next);
+          updateAxiosToken(next);
         }
       }}
     >
       <NavMenu />
       <Switch>
         <PrivateRoute exact path="/" component={Home} />
-        <Route path="/login" component={Login} />
-        <Route path="/sign-up" component={SignUp} />
-        <PrivateRoute path="/counter" component={Counter} />
-        <Route path="/fetchdata" component={FetchData} />
+        <NotLoggedInRoute path="/login" component={Login} />
+        <NotLoggedInRoute path="/sign-up" component={SignUp} />
       </Switch>
     </AuthContext.Provider>
   );
