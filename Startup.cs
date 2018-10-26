@@ -55,11 +55,16 @@ namespace notes
                     OnTokenValidated = context =>
                     {
                         var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
-                        var userId = int.Parse(context.Principal.Identity.Name);
+                        var idStr = context.Principal.Identity.Name;
+                        if (idStr == null)
+                        {
+                            context.Fail("Unauthorized");
+                            return Task.CompletedTask;
+                        }
+                        var userId = int.Parse(idStr);
                         var user = userService.GetById(userId);
                         if (user == null)
                         {
-                            // return unauthorized if user no longer exists
                             context.Fail("Unauthorized");
                         }
                         return Task.CompletedTask;

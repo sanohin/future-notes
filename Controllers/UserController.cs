@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using System.IdentityModel.Tokens.Jwt;
 using notes.Helpers;
-// using Microsoft.Extensions.Options;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
@@ -22,7 +21,10 @@ namespace notes.Controllers
     {
         private IUserService _userService;
         private IMapper _mapper;
-        public UsersController(IUserService userService, IMapper mapper)
+        public UsersController(
+            IUserService userService,
+            IMapper mapper
+        )
         {
             _userService = userService;
             _mapper = mapper;
@@ -78,16 +80,11 @@ namespace notes.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
-        [AllowAnonymous]
-        [HttpGet]
-        public IActionResult GetAll()
+        [Authorize]
+        [HttpGet("me")]
+        public IActionResult Me()
         {
-            var users = _userService.GetAll();
-            var userDtos = _mapper.Map<IList<UserDto>>(users);
-            Console.Write(userDtos);
-
-            return Ok(userDtos);
+            return Ok("");
         }
-
     }
 }

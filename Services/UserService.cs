@@ -178,5 +178,24 @@ namespace notes.Services
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
+        public int? GetUserByToken(string token)
+        {
+            var jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
+            if (string.IsNullOrEmpty(token))
+                return null;
+
+            var jwtsecureToken = jwtSecurityTokenHandler.ReadToken(token) as JwtSecurityToken;
+            var claims = jwtsecureToken?.Claims;
+            if (claims == null)
+            {
+                return null;
+            }
+            var claim = claims.FirstOrDefault(e => e.Type == ClaimTypes.Name);
+            if (claim == null)
+            {
+                return null;
+            }
+            return Int32.Parse(claim.Value);
+        }
     }
 }
