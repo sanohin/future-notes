@@ -27,13 +27,21 @@ export const logIn = ({ userName, password }) =>
       console.log(err.response.message);
     });
 
-export const validateMe = token =>
+export const validateMe = () =>
   axiosInstance
     .get('/api/users/me')
-    .then(res => true)
+    .then(() => true)
     .catch(err => {
       if (err.response.status === 401) {
         return false;
       }
       return null;
     });
+
+export const getNotes = () => axiosInstance.get('/api/notes').then(r => r.data);
+
+export const updateNote = ({ id, content }) =>
+  axiosInstance.patch(`/api/notes/${id}`, { content });
+
+export const createNote = content =>
+  axiosInstance.post(`/api/notes`, { content });
