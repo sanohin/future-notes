@@ -1,9 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using notes.Entities;
 using notes.Helpers;
 using notes.Data;
+using notes.Services;
+using notes.Dtos;
+using Microsoft.Extensions.Options;
 
 namespace notes.Services
 {
@@ -15,15 +23,18 @@ namespace notes.Services
         User Create(User user, string password);
         void Update(User user, string password = null);
         void Delete(int id);
+        string GetToken(User user);
     }
 
     public class UserService : IUserService
     {
         private DataContext _context;
+        private readonly AppSettings _appSettings;
 
-        public UserService(DataContext context)
+        public UserService(DataContext context, IOptions<AppSettings> appSettings)
         {
             _context = context;
+            _appSettings = appSettings.Value;
         }
 
         public User Authenticate(string username, string password)
@@ -150,6 +161,22 @@ namespace notes.Services
             }
 
             return true;
+        }
+        public string GetToken(User user)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.Name, user.Id.ToString())
+                }),
+                Expires = DateTime.UtcNow.AddDays(7),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
         }
     }
 }
