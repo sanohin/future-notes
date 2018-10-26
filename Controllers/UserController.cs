@@ -54,6 +54,7 @@ namespace notes.Controllers
         [HttpPost("register")]
         public IActionResult Register([FromBody]UserDto userDto)
         {
+            userDto.Id = 0;
             Console.Write(userDto);
             // map dto to entity
             var user = _mapper.Map<User>(userDto);
