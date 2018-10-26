@@ -3,12 +3,12 @@ import { getSavedToken } from './components/auth/utils';
 
 export const axiosInstance = axios.create({
   headers: {
-    Authentication: `Bearer ${getSavedToken()}`
+    Authorization: `Bearer ${getSavedToken()}`
   }
 });
 
 export const updateAxiosToken = next => {
-  axiosInstance.defaults.headers.Authentication = `Bearer ${next}`;
+  axiosInstance.defaults.headers.Authorization = `Bearer ${next}`;
 };
 
 export const signUp = ({ userName, password, firstName, lastName }) =>
@@ -27,12 +27,13 @@ export const logIn = ({ userName, password }) =>
       console.log(err.response.message);
     });
 
-export const validateMe = token => {
-  return new Promise(
-    res =>
-      setTimeout(() => {
-        res(true);
-      }),
-    1000
-  );
-};
+export const validateMe = token =>
+  axiosInstance
+    .get('/api/users/me')
+    .then(res => true)
+    .catch(err => {
+      if (err.response.status === 401) {
+        return false;
+      }
+      return null;
+    });
