@@ -4,7 +4,7 @@ import { Textarea, TextInputField, Button, Pane, Heading } from 'evergreen-ui';
 import { Wrapper } from './Wrapper';
 
 export const Login = () => {
-  const [email, changeEmail] = useState('');
+  const [user, changeUser] = useState('');
   const [pass, changePass] = useState('');
   return (
     <Wrapper>
@@ -14,12 +14,11 @@ export const Login = () => {
           <TextInputField
             required
             autoFocus
-            value={email}
-            onChange={e => changeEmail(e.target.value)}
-            type="email"
-            name="email"
-            label="Email"
-            placeholder="Enter email"
+            value={user}
+            onChange={e => changeUser(e.target.value)}
+            name="username"
+            label="Username"
+            placeholder="Enter username"
           />
           <TextInputField
             required
@@ -34,7 +33,7 @@ export const Login = () => {
             type="submit"
             iconAfter="arrow-right"
             appearance="primary"
-            disabled={!pass || !email}
+            disabled={!pass || !user}
           >
             Login
           </Button>

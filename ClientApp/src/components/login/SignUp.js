@@ -15,11 +15,11 @@ const Input = ({ onChange, label, ...rest }) => (
 );
 
 export const SignUp = () => {
-  const [email, changeEmail] = useState('');
+  const [user, changeUser] = useState('');
   const [pass, changePass] = useState('');
   const [name, changeName] = useState('');
   const [surname, changeSurname] = useState('');
-  const canSubmit = email && pass && name && surname;
+  const canSubmit = user && pass && name && surname;
   return (
     <Wrapper>
       <Heading size={700}>Sign up</Heading>
@@ -40,11 +40,10 @@ export const SignUp = () => {
           />
           <Input
             required
-            value={email}
-            onChange={changeEmail}
-            type="email"
-            name="email"
-            label="Email"
+            value={user}
+            onChange={changeUser}
+            name="username"
+            label="Username"
           />
           <Input
             required
