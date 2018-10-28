@@ -1,9 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Pane, Textarea, Button } from 'evergreen-ui';
-import { unstable_createResource } from 'react-cache';
 import { getNotes, updateNote, createNote } from '../../api';
-
-const notesResource = unstable_createResource(getNotes);
 
 const Note = ({ value, id, save }) => {
   const [localText, changeText] = useState(value);
@@ -14,7 +11,9 @@ const Note = ({ value, id, save }) => {
         style={{ display: 'contents' }}
         onSubmit={e => {
           e.preventDefault();
-          save(id, localText);
+          save(id, localText).then(next => {
+            changeText(next);
+          });
         }}
       >
         <Textarea
@@ -35,18 +34,26 @@ const Note = ({ value, id, save }) => {
 };
 
 export const NotesList = () => {
-  const notes = notesResource.read();
-  const onChange = (id, value) => {
-    return updateNote({ id, content: value }).then(() => {
-      // update cache ?
+  const [notes, updateNotes] = useState([]);
+  const onChange = (id, content) => {
+    return updateNote({ id, content }).then(() => {
+      const next = notes.map(el => (el.id === id ? { ...el, content } : el));
+      updateNotes(next);
+      return content;
     });
   };
-  const add = (id, content) => {
-    createNote(content);
+  const addNote = (_, content) => {
+    return createNote(content).then(res => {
+      updateNotes(notes.concat(res));
+      return '';
+    });
   };
+  useEffect(() => {
+    getNotes().then(next => updateNotes(next));
+  }, []);
   return (
     <Pane padding={24}>
-      <Note id={0} value="" save={add} />
+      <Note id={0} value="" save={addNote} />
       {notes.map(note => (
         <Note key={note.id} id={note.id} value={note.content} save={onChange} />
       ))}

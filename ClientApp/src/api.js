@@ -44,4 +44,4 @@ export const updateNote = ({ id, content }) =>
   axiosInstance.patch(`/api/notes/${id}`, { content });
 
 export const createNote = content =>
-  axiosInstance.post(`/api/notes`, { content });
+  axiosInstance.post(`/api/notes`, { content }).then(res => res.data);
