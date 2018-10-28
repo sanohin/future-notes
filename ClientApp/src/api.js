@@ -30,7 +30,7 @@ export const logIn = ({ userName, password }) =>
 export const validateMe = () =>
   axiosInstance
     .get('/api/users/me')
-    .then(() => true)
+    .then(({ data }) => data)
     .catch(err => {
       if (err.response.status === 401) {
         return false;

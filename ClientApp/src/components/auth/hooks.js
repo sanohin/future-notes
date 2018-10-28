@@ -1,11 +1,18 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { unstable_createResource } from 'react-cache';
 import { AuthContext } from './AuthContext';
 import { validateMe } from '../../api';
 
-const isLoggedIn = unstable_createResource(validateMe);
+const getMe = unstable_createResource(validateMe);
 
 export const useLoggedIn = () => {
-  const { token } = useContext(AuthContext);
-  return token && isLoggedIn.read(token);
+  const { token, setUser } = useContext(AuthContext);
+  const user = getMe.read(token);
+  useEffect(
+    () => {
+      setUser(user);
+    },
+    [user]
+  );
+  return token && user;
 };

@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
@@ -11,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using notes.Services;
 using notes.Dtos;
 using notes.Entities;
+using notes.Data;
 
 namespace notes.Controllers
 {
@@ -19,28 +21,31 @@ namespace notes.Controllers
     [Route("api/users")]
     public class UsersController : ControllerBase
     {
-        private IUserService _userService;
-        private IMapper _mapper;
+        private IUserService userService;
+        private IMapper mapper;
+        private DataContext context;
         public UsersController(
             IUserService userService,
-            IMapper mapper
+            IMapper mapper,
+            DataContext context
         )
         {
-            _userService = userService;
-            _mapper = mapper;
+            this.userService = userService;
+            this.mapper = mapper;
+            this.context = context;
         }
 
         [AllowAnonymous]
         [HttpPost("authenticate")]
         public IActionResult Authenticate([FromBody]UserDto userDto)
         {
-            var user = _userService.Authenticate(userDto.Username, userDto.Password);
+            var user = userService.Authenticate(userDto.Username, userDto.Password);
 
             if (user == null)
             {
                 return BadRequest(new { message = "Username or password is incorrect" });
             }
-            var token = _userService.GetToken(user);
+            var token = userService.GetToken(user);
 
             return Ok(new
             {
@@ -59,19 +64,19 @@ namespace notes.Controllers
             userDto.Id = 0;
             Console.Write(userDto);
             // map dto to entity
-            var user = _mapper.Map<User>(userDto);
+            var user = mapper.Map<User>(userDto);
 
             try
             {
                 // save 
-                var createdUser = _userService.Create(user, userDto.Password);
+                var createdUser = userService.Create(user, userDto.Password);
                 return Ok(new
                 {
                     Id = createdUser.Id,
                     Username = createdUser.Username,
                     FirstName = createdUser.FirstName,
                     LastName = createdUser.LastName,
-                    Token = _userService.GetToken(user)
+                    Token = userService.GetToken(user)
                 });
             }
             catch (AppException ex)
@@ -84,7 +89,15 @@ namespace notes.Controllers
         [HttpGet("me")]
         public IActionResult Me()
         {
-            return Ok("");
+            var userId = int.Parse(HttpContext.User.Identity.Name);
+            var user = this.context.Users.Single(el => el.Id == userId);
+            return Ok(new
+            {
+                Id = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                UserName = user.Username
+            });
         }
     }
 }
