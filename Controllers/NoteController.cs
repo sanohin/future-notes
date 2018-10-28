@@ -1,7 +1,5 @@
-
 using System;
 using System.Linq;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using notes.Entities;
@@ -15,7 +13,6 @@ namespace notes.Controllers
     public class NoteController : ControllerBase
     {
         DataContext context;
-        private readonly UserManager<User> _userManager;
         public NoteController(DataContext context)
         {
             this.context = context;
