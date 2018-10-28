@@ -1,8 +1,8 @@
 import React, { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { TextInputField, Button, Pane, Heading } from 'evergreen-ui';
+import { TextInputField, Button, Alert, Pane, Heading } from 'evergreen-ui';
 import { Wrapper } from './Wrapper';
-import { toLowerFirstLetter } from '../../utils';
+import { toLowerFirstLetter, extractError } from '../../utils';
 import { signUp } from '../../api';
 import { AuthContext } from '../auth';
 
@@ -22,18 +22,24 @@ export const SignUp = () => {
   const [pass, changePass] = useState('');
   const [name, changeName] = useState('');
   const [surname, changeSurname] = useState('');
+  const [error, setError] = useState('');
   const canSubmit = user && pass && name && surname;
 
   const onSubmit = e => {
     e.preventDefault();
+    setError('');
     signUp({
       userName: user,
       password: pass,
       firstName: name,
       lastName: surname
-    }).then(res => {
-      ctx.setToken(res.token);
-    });
+    })
+      .then(res => {
+        ctx.setToken(res.token);
+      })
+      .catch(e => {
+        setError(extractError(e.response));
+      });
   };
 
   return (
@@ -69,6 +75,7 @@ export const SignUp = () => {
             name="password"
             label="Password"
           />
+          {error && <Alert intent="danger" title={error} marginBottom={16} />}
           <Link to="/login">
             <Button type="button" iconBefore="arrow-left">
               Back to login

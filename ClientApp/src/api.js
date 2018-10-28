@@ -14,18 +14,12 @@ export const updateAxiosToken = next => {
 export const signUp = ({ userName, password, firstName, lastName }) =>
   axiosInstance
     .post('api/users/register', { userName, password, firstName, lastName })
-    .then(({ data }) => data)
-    .catch(err => {
-      console.log(err.response.message);
-    });
+    .then(({ data }) => data);
 
 export const logIn = ({ userName, password }) =>
   axiosInstance
     .post('api/users/authenticate', { userName, password })
-    .then(({ data }) => data)
-    .catch(err => {
-      console.log(err.response.message);
-    });
+    .then(({ data }) => data);
 
 export const validateMe = () =>
   axiosInstance
