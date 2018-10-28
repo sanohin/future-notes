@@ -3,15 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
-using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Options;
 using notes.Entities;
 using notes.Helpers;
 using notes.Data;
-using notes.Services;
-using notes.Dtos;
-using Microsoft.Extensions.Options;
 
 namespace notes.Services
 {
