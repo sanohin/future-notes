@@ -12,6 +12,7 @@ using AutoMapper;
 using notes.Helpers;
 using notes.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Sqlite;
 using notes.Data;
 
 namespace notes
@@ -30,7 +31,7 @@ namespace notes
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddAutoMapper();
-            services.AddDbContext<DataContext>(x => x.UseInMemoryDatabase("TestDb"));
+            services.AddDbContext<DataContext>(options => options.UseSqlite("Data Source=test.db"));
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {

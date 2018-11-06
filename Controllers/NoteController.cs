@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using notes.Entities;
 using notes.Data;
+using System.Threading.Tasks;
 
 namespace notes.Controllers
 {
@@ -19,7 +20,7 @@ namespace notes.Controllers
         }
 
         [HttpPost]
-        public IActionResult Add([FromBody] NotesDto createData)
+        public async Task<IActionResult> Add([FromBody] NotesDto createData)
         {
             var userId = int.Parse(HttpContext.User.Identity.Name);
             Console.Write(userId);
@@ -29,7 +30,7 @@ namespace notes.Controllers
                 UserId = userId
             };
             context.Notes.Add(elem);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
             return Ok(new NotesDto
             {
                 Id = elem.Id,
@@ -61,7 +62,7 @@ namespace notes.Controllers
 
 
         [Route("{id}"), HttpDelete]
-        public IActionResult Remove([FromRoute] int id)
+        public async Task<IActionResult> Remove([FromRoute] int id)
         {
             var userId = int.Parse(HttpContext.User.Identity.Name);
             var res = context.Notes.SingleOrDefault(el => el.Id == id);
@@ -70,13 +71,13 @@ namespace notes.Controllers
                 return NotFound();
             }
             context.Notes.Remove(res);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
             return Ok();
         }
 
 
         [Route("{id}"), HttpPatch]
-        public IActionResult Update([FromRoute] int id, [FromBody] NotesDto d)
+        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] NotesDto d)
         {
             var userId = int.Parse(HttpContext.User.Identity.Name);
             var res = context.Notes.SingleOrDefault(el => el.Id == id);
@@ -87,7 +88,7 @@ namespace notes.Controllers
             if (d.Content != null)
             {
                 res.Content = d.Content;
-                context.SaveChanges();
+                await context.SaveChangesAsync();
             }
             return Ok();
         }

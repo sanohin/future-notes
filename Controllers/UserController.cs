@@ -8,6 +8,7 @@ using notes.Services;
 using notes.Dtos;
 using notes.Entities;
 using notes.Data;
+using System.Threading.Tasks;
 
 namespace notes.Controllers
 {
@@ -54,7 +55,7 @@ namespace notes.Controllers
 
         [AllowAnonymous]
         [HttpPost("register")]
-        public IActionResult Register([FromBody]UserDto userDto)
+        public async Task<IActionResult> Register([FromBody]UserDto userDto)
         {
             userDto.Id = 0;
             Console.Write(userDto);
@@ -64,7 +65,7 @@ namespace notes.Controllers
             try
             {
                 // save 
-                var createdUser = userService.Create(user, userDto.Password);
+                var createdUser = await userService.Create(user, userDto.Password);
                 return Ok(new
                 {
                     Id = createdUser.Id,

@@ -9,6 +9,7 @@ using Microsoft.Extensions.Options;
 using notes.Entities;
 using notes.Helpers;
 using notes.Data;
+using System.Threading.Tasks;
 
 namespace notes.Services
 {
@@ -17,8 +18,8 @@ namespace notes.Services
         User Authenticate(string username, string password);
         IEnumerable<User> GetAll();
         User GetById(int id);
-        User Create(User user, string password);
-        void Update(User user, string password = null);
+        Task<User> Create(User user, string password);
+        Task Update(User user, string password = null);
         void Delete(int id);
         string GetToken(User user);
     }
@@ -63,7 +64,7 @@ namespace notes.Services
             return _context.Users.Find(id);
         }
 
-        public User Create(User user, string password)
+        public async Task<User> Create(User user, string password)
         {
             // validation
             if (string.IsNullOrWhiteSpace(password))
@@ -78,13 +79,13 @@ namespace notes.Services
             user.PasswordHash = passwordHash;
             user.PasswordSalt = passwordSalt;
 
-            _context.Users.Add(user);
-            _context.SaveChanges();
+            await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
 
             return user;
         }
 
-        public void Update(User userParam, string password = null)
+        public async Task Update(User userParam, string password = null)
         {
             var user = _context.Users.Find(userParam.Id);
 
@@ -114,7 +115,7 @@ namespace notes.Services
             }
 
             _context.Users.Update(user);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
         public void Delete(int id)
