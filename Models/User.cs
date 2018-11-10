@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 
 namespace notes.Entities
 {
+    [Serializable]
     public class User
     {
         public int Id { get; set; }

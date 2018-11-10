@@ -1,12 +1,21 @@
 import React, { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { TextInputField, Button, Alert, Pane, Heading } from 'evergreen-ui';
+import {
+  TextInputField,
+  Button,
+  Alert,
+  Pane,
+  Heading,
+  Spinner
+} from 'evergreen-ui';
 import { AuthContext } from '../auth';
 import { Wrapper } from './Wrapper';
 import { logIn } from '../../api';
 import { extractError } from '../../utils';
 
 export const Login = () => {
+  const [loading, setLoading] = useState(false);
+
   const [user, changeUser] = useState('');
   const [pass, changePass] = useState('');
   const [error, setError] = useState('');
@@ -14,14 +23,17 @@ export const Login = () => {
   const login = e => {
     setError('');
     e.preventDefault();
+    setLoading(true);
     logIn({ userName: user, password: pass })
       .then(res => {
         if (res) {
           ctx.setToken(res.token);
         }
+        setLoading(false);
       })
       .catch(e => {
         setError(extractError(e.response));
+        setLoading(false);
       });
   };
   return (
@@ -52,6 +64,7 @@ export const Login = () => {
             type="submit"
             iconAfter="arrow-right"
             appearance="primary"
+            isLoading={loading}
             disabled={!pass || !user}
           >
             Login

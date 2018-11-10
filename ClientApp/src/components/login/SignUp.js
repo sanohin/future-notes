@@ -1,6 +1,13 @@
 import React, { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { TextInputField, Button, Alert, Pane, Heading } from 'evergreen-ui';
+import {
+  TextInputField,
+  Button,
+  Alert,
+  Pane,
+  Heading,
+  Spinner
+} from 'evergreen-ui';
 import { Wrapper } from './Wrapper';
 import { toLowerFirstLetter, extractError } from '../../utils';
 import { signUp } from '../../api';
@@ -18,6 +25,8 @@ const Input = ({ onChange, label, ...rest }) => (
 
 export const SignUp = () => {
   const ctx = useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
+
   const [user, changeUser] = useState('');
   const [pass, changePass] = useState('');
   const [name, changeName] = useState('');
@@ -28,6 +37,7 @@ export const SignUp = () => {
   const onSubmit = e => {
     e.preventDefault();
     setError('');
+    setLoading(true);
     signUp({
       userName: user,
       password: pass,
@@ -36,9 +46,11 @@ export const SignUp = () => {
     })
       .then(res => {
         ctx.setToken(res.token);
+        setLoading(false);
       })
       .catch(e => {
         setError(extractError(e.response));
+        setLoading(false);
       });
   };
 
@@ -85,6 +97,7 @@ export const SignUp = () => {
             disabled={!canSubmit}
             type="submit"
             appearance="primary"
+            isLoading={loading}
             marginLeft={12}
             intent="success"
             iconAfter="arrow-right"

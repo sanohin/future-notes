@@ -1,5 +1,9 @@
+using System;
+
 namespace notes.Entities
 {
+
+    [Serializable]
     public class Note
     {
         public int Id { get; set; }

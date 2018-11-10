@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using notes.Entities;
 using notes.Data;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace notes.Controllers
 {
@@ -14,16 +15,18 @@ namespace notes.Controllers
     public class NoteController : ControllerBase
     {
         DataContext context;
-        public NoteController(DataContext context)
+        ILogger<NoteController> logger;
+        public NoteController(DataContext context, ILogger<NoteController> logger)
         {
             this.context = context;
+            this.logger = logger;
         }
 
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] NotesDto createData)
         {
             var userId = int.Parse(HttpContext.User.Identity.Name);
-            Console.Write(userId);
+            logger.LogInformation($"add not for user {userId}");
             var elem = new Note()
             {
                 Content = createData.Content,
@@ -43,6 +46,8 @@ namespace notes.Controllers
         public ActionResult<NotesDto[]> GetList([FromRoute] int id)
         {
             var userId = int.Parse(HttpContext.User.Identity.Name);
+            logger.LogInformation($"get list for user {userId}");
+
             var items = context.Notes.Where(e => e.UserId == userId);
             return Ok(items);
         }
@@ -80,6 +85,7 @@ namespace notes.Controllers
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] NotesDto d)
         {
             var userId = int.Parse(HttpContext.User.Identity.Name);
+            logger.LogInformation($"update note {id} for user {userId}");
             var res = context.Notes.SingleOrDefault(el => el.Id == id);
             if (res == null || res.UserId != userId)
             {

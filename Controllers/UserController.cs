@@ -9,6 +9,7 @@ using notes.Dtos;
 using notes.Entities;
 using notes.Data;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace notes.Controllers
 {
@@ -20,15 +21,19 @@ namespace notes.Controllers
         private IUserService userService;
         private IMapper mapper;
         private DataContext context;
+        private ILogger<UsersController> logger;
+
         public UsersController(
             IUserService userService,
             IMapper mapper,
-            DataContext context
+            DataContext context,
+            ILogger<UsersController> logger
         )
         {
             this.userService = userService;
             this.mapper = mapper;
             this.context = context;
+            this.logger = logger;
         }
 
         [AllowAnonymous]
@@ -36,12 +41,16 @@ namespace notes.Controllers
         public IActionResult Authenticate([FromBody]UserDto userDto)
         {
             var user = userService.Authenticate(userDto.Username, userDto.Password);
+            logger.LogInformation($"users {context.Users.ToArray().Serialize()}");
 
             if (user == null)
             {
+                logger.LogError($"no such user {userDto.Username}");
+
                 return BadRequest(new { message = "Username or password is incorrect" });
             }
             var token = userService.GetToken(user);
+            logger.LogInformation($"user {userDto.Username} logged in");
 
             return Ok(new
             {
@@ -66,6 +75,8 @@ namespace notes.Controllers
             {
                 // save 
                 var createdUser = await userService.Create(user, userDto.Password);
+                logger.LogInformation($"user created {userDto.Username}");
+
                 return Ok(new
                 {
                     Id = createdUser.Id,
@@ -87,6 +98,8 @@ namespace notes.Controllers
         {
             var userId = int.Parse(HttpContext.User.Identity.Name);
             var user = this.context.Users.Single(el => el.Id == userId);
+            logger.LogInformation($"user exists {user.Username}");
+
             return Ok(new
             {
                 Id = user.Id,
