@@ -31,7 +31,7 @@ namespace notes
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddAutoMapper();
-            services.AddDbContext<DataContext>(options => options.UseInMemoryDatabase("Data Source=test.db"));
+            services.AddDbContext<DataContext>(options => options.UseSqlite("Data Source=db.db"));
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {

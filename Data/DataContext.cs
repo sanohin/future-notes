@@ -50,34 +50,17 @@ namespace notes.Data
             };
         }
     }
-    public class SeedData
+    public class DataInitializer
     {
         public static void Initialize(IServiceProvider serviceProvider)
         {
 
-            var context = serviceProvider.GetRequiredService<DataContext>();
-            var logger = serviceProvider.GetRequiredService<ILogger<SeedData>>();
+            serviceProvider.GetRequiredService<DataContext>().Database.Migrate();
 
-            context.Database.EnsureCreated();
-            if (File.Exists("users.json"))
-            {
-                var users = File.ReadAllText("users.json").Deserialize<User[]>();
-                logger.LogInformation($"seeding users {users.Serialize()}");
-                context.Users.AddRange(users);
-                context.SaveChanges();
-            }
-            else
-            {
-                logger.LogInformation($"no persist file");
-
-            }
-            if (File.Exists("notes.json"))
-            {
-                var notes = File.ReadAllText("notes.json").Deserialize<List<Note>>();
-                context.Notes.AddRange(notes);
-                context.SaveChanges();
-
-            }
+            var db = serviceProvider.GetRequiredService<DataContext>();
+            var logger = serviceProvider.GetRequiredService<ILogger<DataInitializer>>();
+            db.Database.Migrate();
+            logger.LogInformation("Migration done");
         }
     }
     public class DataContext : DbContext
@@ -91,14 +74,5 @@ namespace notes.Data
 
         public DbSet<User> Users { get; set; }
         public DbSet<Note> Notes { get; set; }
-        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
-        {
-            await base.SaveChangesAsync();
-            var task = Notes.WriteToFile("notes.json");
-            var task2 = Users.WriteToFile("users.json");
-            await task;
-            await task2;
-            return 0;
-        }
     }
 }

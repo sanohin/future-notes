@@ -22,7 +22,7 @@ namespace notes
                 var services = scope.ServiceProvider;
                 try
                 {
-                    SeedData.Initialize(services);
+                    DataInitializer.Initialize(services);
                 }
                 catch (Exception ex)
                 {
