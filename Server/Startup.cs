@@ -1,28 +1,31 @@
-﻿using System;
-using System.Net.WebSockets;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Http;
 
 namespace Server
 {
     public class Startup
     {
+        private static ProxyOptions SPA = new ProxyOptions
+        {
+            Scheme = "http",
+            Host = "web",
+            Port = "80"
+        };
+        private static ProxyOptions API = new ProxyOptions
+        {
+            Scheme = "http",
+            Host = "client",
+            Port = "80"
+        };
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
-            app.RunProxy(new ProxyOptions
-            {
-                Scheme = "http",
-                Host = "localhost",
-                Port = "5005"
-            });
+            app.Map("/api", e => e.RunProxy(API));
+            app.MapWhen(s => !s.Request.Path.StartsWithSegments("/api"), r => r.RunProxy(SPA));
         }
     }
 }

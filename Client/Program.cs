@@ -41,7 +41,6 @@ namespace notes
             logging.AddConsole();
             logging.AddDebug();
             logging.AddEventSourceLogger();
-        }).UseUrls("http://localhost:5005/")
-                .UseStartup<Startup>();
+        }).UseStartup<Startup>();
     }
 }
