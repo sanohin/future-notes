@@ -41,7 +41,6 @@ namespace notes.Controllers
         public IActionResult Authenticate([FromBody]UserDto userDto)
         {
             var user = userService.Authenticate(userDto.Username, userDto.Password);
-            logger.LogInformation($"users {context.Users.ToArray().Serialize()}");
 
             if (user == null)
             {
