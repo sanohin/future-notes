@@ -1,17 +1,9 @@
 import React, { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  TextInputField,
-  Button,
-  Alert,
-  Pane,
-  Heading,
-  Spinner
-} from 'evergreen-ui';
+import { TextInputField, Button, Alert, Pane, Heading } from 'evergreen-ui';
 import { Wrapper } from './Wrapper';
-import { toLowerFirstLetter, extractError } from '../../utils';
+import { toLowerFirstLetter } from '../../utils';
 import { signUp } from '../../api';
-import { AuthContext } from '../auth';
 
 const Input = ({ onChange, label, ...rest }) => (
   <TextInputField
@@ -24,32 +16,22 @@ const Input = ({ onChange, label, ...rest }) => (
 );
 
 export const SignUp = () => {
-  const ctx = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
 
   const [user, changeUser] = useState('');
   const [pass, changePass] = useState('');
-  const [name, changeName] = useState('');
-  const [surname, changeSurname] = useState('');
   const [error, setError] = useState('');
-  const canSubmit = user && pass && name && surname;
+  const canSubmit = user && pass;
 
   const onSubmit = e => {
     e.preventDefault();
     setError('');
     setLoading(true);
-    signUp({
-      userName: user,
-      password: pass,
-      firstName: name,
-      lastName: surname
-    })
-      .then(res => {
-        ctx.setToken(res.token);
-        setLoading(false);
-      })
+    signUp(user, pass)
       .catch(e => {
-        setError(extractError(e.response));
+        setError(e.message);
+      })
+      .finally(() => {
         setLoading(false);
       });
   };
@@ -61,23 +43,11 @@ export const SignUp = () => {
         <form onSubmit={onSubmit}>
           <Input
             required
-            autoFocus
-            value={name}
-            onChange={changeName}
-            label="First name"
-          />
-          <Input
-            required
-            value={surname}
-            onChange={changeSurname}
-            label="Last Name"
-          />
-          <Input
-            required
             value={user}
             onChange={changeUser}
-            name="username"
-            label="Username"
+            name="email"
+            type="email"
+            label="Email"
           />
           <Input
             required

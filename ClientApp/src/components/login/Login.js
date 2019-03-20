@@ -5,34 +5,27 @@ import {
   Button,
   Alert,
   Pane,
-  Heading,
-  Spinner
+  Heading
+  // Spinner
 } from 'evergreen-ui';
-import { AuthContext } from '../auth';
 import { Wrapper } from './Wrapper';
 import { logIn } from '../../api';
-import { extractError } from '../../utils';
 
 export const Login = () => {
   const [loading, setLoading] = useState(false);
 
-  const [user, changeUser] = useState('');
+  const [email, changeEmail] = useState('');
   const [pass, changePass] = useState('');
   const [error, setError] = useState('');
-  const ctx = useContext(AuthContext);
   const login = e => {
-    setError('');
     e.preventDefault();
+    setError('');
     setLoading(true);
-    logIn({ userName: user, password: pass })
-      .then(res => {
-        if (res) {
-          ctx.setToken(res.token);
-        }
-        setLoading(false);
-      })
+    logIn(email, pass)
       .catch(e => {
-        setError(extractError(e.response));
+        setError(e.message);
+      })
+      .finally(() => {
         setLoading(false);
       });
   };
@@ -44,11 +37,12 @@ export const Login = () => {
           <TextInputField
             required
             autoFocus
-            value={user}
-            onChange={e => changeUser(e.target.value)}
-            name="username"
-            label="Username"
-            placeholder="Enter username"
+            value={email}
+            onChange={e => changeEmail(e.target.value)}
+            name="email"
+            label="Email"
+            type="email"
+            placeholder="Enter email"
           />
           <TextInputField
             required
@@ -65,7 +59,7 @@ export const Login = () => {
             iconAfter="arrow-right"
             appearance="primary"
             isLoading={loading}
-            disabled={!pass || !user}
+            disabled={!pass || !email}
           >
             Login
           </Button>
