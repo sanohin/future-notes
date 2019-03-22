@@ -1,11 +1,11 @@
-import React, { useContext } from 'react';
-import { Avatar, Pane, Popover, Button } from 'evergreen-ui';
-import { AuthContext } from '../auth';
-import { logOut } from '../../api';
+import React, { useContext } from "react";
+import { Avatar, Pane, Popover, Button } from "evergreen-ui";
+import { AuthContext } from "../auth";
+import { logOut } from "../../api";
 
 export const Header = () => {
   const { user } = useContext(AuthContext);
-  const name = user ? `${user.email}` : '';
+  const name = user ? `${user.email}` : "";
 
   return (
     <Pane display="flex" justifyContent="flex-end">

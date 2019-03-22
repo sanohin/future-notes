@@ -1,2 +1,2 @@
-export * from './AuthContext';
-export * from './Routes';
+export * from "./AuthContext";
+export * from "./Routes";

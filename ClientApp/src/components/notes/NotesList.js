@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Pane, Textarea, Button } from 'evergreen-ui';
-import { getNotes, updateNote, createNote } from '../../api';
+import React, { useState, useEffect } from "react";
+import { Pane, Textarea, Button } from "evergreen-ui";
+import { getNotes, updateNote, createNote } from "../../api";
 
 const Note = ({ value, id, save, loading }) => {
   const [localText, changeText] = useState(value);
@@ -8,7 +8,7 @@ const Note = ({ value, id, save, loading }) => {
   return (
     <Pane marginTop={24} display="flex">
       <form
-        style={{ display: 'contents' }}
+        style={{ display: "contents" }}
         onSubmit={e => {
           e.preventDefault();
           save(id, localText).then(next => {
@@ -39,7 +39,7 @@ function setLoading(id) {
 function unsetLoading(id) {
   return s => ({ ...s, [id]: false });
 }
-const newNoteId = 'new';
+const newNoteId = "new";
 export const NotesList = () => {
   const [notes, updateNotes] = useState([]);
   const [loading, updateLoading] = useState({});
@@ -65,7 +65,7 @@ export const NotesList = () => {
         updateLoading(unsetLoading(newNoteId));
 
         updateNotes(notes => notes.concat(res));
-        return '';
+        return "";
       },
       () => updateLoading(unsetLoading(newNoteId))
     );

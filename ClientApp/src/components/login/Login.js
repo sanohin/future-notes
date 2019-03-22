@@ -1,5 +1,5 @@
-import React, { useState, useContext } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useContext } from "react";
+import { Link } from "react-router-dom";
 import {
   TextInputField,
   Button,
@@ -7,19 +7,19 @@ import {
   Pane,
   Heading
   // Spinner
-} from 'evergreen-ui';
-import { Wrapper } from './Wrapper';
-import { logIn } from '../../api';
+} from "evergreen-ui";
+import { Wrapper } from "./Wrapper";
+import { logIn } from "../../api";
 
 export const Login = () => {
   const [loading, setLoading] = useState(false);
 
-  const [email, changeEmail] = useState('');
-  const [pass, changePass] = useState('');
-  const [error, setError] = useState('');
+  const [email, changeEmail] = useState("");
+  const [pass, changePass] = useState("");
+  const [error, setError] = useState("");
   const login = e => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
     logIn(email, pass)
       .catch(e => {

@@ -1,5 +1,5 @@
 /* globals firebase */
-import axios from 'axios';
+import axios from "axios";
 
 export const axiosInstance = axios.create({});
 
@@ -17,7 +17,7 @@ export const logOut = () => {
 
 export const validateMe = () =>
   axiosInstance
-    .get('/api/users/me')
+    .get("/api/users/me")
     .then(({ data }) => data)
     .catch(err => {
       if (err.response.status === 401) {
@@ -26,7 +26,7 @@ export const validateMe = () =>
       return null;
     });
 
-export const getNotes = () => axiosInstance.get('/api/notes').then(r => r.data);
+export const getNotes = () => axiosInstance.get("/api/notes").then(r => r.data);
 
 export const updateNote = ({ id, content }) =>
   axiosInstance.patch(`/api/notes/${id}`, { content });

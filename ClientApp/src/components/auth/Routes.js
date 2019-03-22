@@ -1,7 +1,7 @@
-import React, { Suspense } from 'react';
-import { Route, Redirect } from 'react-router-dom';
-import { useLoggedIn } from './hooks';
-import { Spinner } from 'evergreen-ui';
+import React, { Suspense } from "react";
+import { Route, Redirect } from "react-router-dom";
+import { useLoggedIn } from "./hooks";
+import { Spinner } from "evergreen-ui";
 
 const PrivateHandler = ({ component, ...rest }) => {
   const [logged, loading] = useLoggedIn();

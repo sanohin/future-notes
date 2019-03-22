@@ -1,5 +1,5 @@
-import React from 'react';
-import { Pane } from 'evergreen-ui';
+import React from "react";
+import { Pane } from "evergreen-ui";
 
 export const Wrapper = ({ children }) => {
   return (

@@ -1,9 +1,9 @@
-import React, { useState, useContext } from 'react';
-import { Link } from 'react-router-dom';
-import { TextInputField, Button, Alert, Pane, Heading } from 'evergreen-ui';
-import { Wrapper } from './Wrapper';
-import { toLowerFirstLetter } from '../../utils';
-import { signUp } from '../../api';
+import React, { useState, useContext } from "react";
+import { Link } from "react-router-dom";
+import { TextInputField, Button, Alert, Pane, Heading } from "evergreen-ui";
+import { Wrapper } from "./Wrapper";
+import { toLowerFirstLetter } from "../../utils";
+import { signUp } from "../../api";
 
 const Input = ({ onChange, label, ...rest }) => (
   <TextInputField
@@ -18,14 +18,14 @@ const Input = ({ onChange, label, ...rest }) => (
 export const SignUp = () => {
   const [loading, setLoading] = useState(false);
 
-  const [user, changeUser] = useState('');
-  const [pass, changePass] = useState('');
-  const [error, setError] = useState('');
+  const [user, changeUser] = useState("");
+  const [pass, changePass] = useState("");
+  const [error, setError] = useState("");
   const canSubmit = user && pass;
 
   const onSubmit = e => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
     signUp(user, pass)
       .catch(e => {
