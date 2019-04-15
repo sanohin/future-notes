@@ -1,4 +1,4 @@
-import React, { Suspense } from "react";
+import React from "react";
 import { Switch } from "react-router";
 import { Login, SignUp } from "./components/login";
 import { NotesList } from "./components/notes";
@@ -9,7 +9,7 @@ import "./app.css";
 export const App = () => {
   return (
     <AuthHandle>
-      <PrivateRoute exact path="/" component={Header} />
+      <PrivateRoute disableSpinner exact path="/" component={Header} />
       <Switch>
         <PrivateRoute exact path="/" component={NotesList} />
         <NotLoggedInRoute path="/login" component={Login} />

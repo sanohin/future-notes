@@ -1,21 +1,58 @@
 import React, { useState, useEffect } from "react";
 import { Pane, Textarea, Button } from "evergreen-ui";
+import { createStore, createEvent, createEffect } from "effector";
+import { Editor, EditorState, RichUtils } from "draft-js";
+import { useStore } from "effector-react";
 import { getNotes, updateNote, createNote } from "../../api";
 
-const Note = ({ value, id, save, loading }) => {
+const $loadingNotes = createStore({});
+const setNoteLoading = createEvent();
+const setNoteFinished = createEvent();
+
+$loadingNotes
+  .on(setNoteLoading, (state, payload) => ({
+    ...state,
+    [payload]: true
+  }))
+  .on(setNoteFinished, (state, payload) => ({
+    ...state,
+    [payload]: false
+  }));
+
+const $notes = createStore([]);
+const loadNotes = createEffect().use(() => getNotes());
+const addNote = createEffect().use(({ id, content }) => {
+  return createNote(content);
+});
+
+const changeNote = createEffect().use(updateNote);
+
+$notes.on(addNote.done, (state, { result }) => [result].concat(state));
+
+addNote.watch(x => setNoteLoading(x.id));
+addNote.done.watch(x => setNoteFinished(x.params.id));
+addNote.fail.watch(x => setNoteFinished(x.params.id));
+
+$notes.on(changeNote.done, (state, { params }) => {
+  return state.map(el => (params.id === el.id ? params : el));
+});
+
+changeNote.watch(x => setNoteLoading(x.id));
+changeNote.done.watch(x => setNoteFinished(x.params.id));
+changeNote.fail.watch(x => setNoteFinished(x.params.id));
+
+$notes.on(loadNotes.done, (_, { result }) => result);
+
+const Note1 = ({ value, id, save, loading }) => {
   const [localText, changeText] = useState(value);
   const hasDiff = value !== localText;
+  const onSave = e => {
+    e.preventDefault();
+    save({ id, content: localText });
+  };
   return (
     <Pane marginTop={24} display="flex">
-      <form
-        style={{ display: "contents" }}
-        onSubmit={e => {
-          e.preventDefault();
-          save(id, localText).then(next => {
-            changeText(next);
-          });
-        }}
-      >
+      <form style={{ display: "contents" }} onSubmit={onSave}>
         <Textarea
           value={localText}
           placeholder="Enter text here"
@@ -33,56 +70,45 @@ const Note = ({ value, id, save, loading }) => {
   );
 };
 
-function setLoading(id) {
-  return s => ({ ...s, [id]: true });
+function Note() {
+  const [editorState, changeState] = React.useState(EditorState.createEmpty);
+  const underline = () => {
+    changeState(RichUtils.toggleInlineStyle(editorState, "UNDERLINE"));
+  };
+  return (
+    <>
+      <button type="button" onClick={underline}>
+        _
+      </button>
+      <Editor editorState={editorState} onChange={changeState} />
+    </>
+  );
 }
-function unsetLoading(id) {
-  return s => ({ ...s, [id]: false });
-}
+
 const newNoteId = "new";
 export const NotesList = () => {
-  const [notes, updateNotes] = useState([]);
-  const [loading, updateLoading] = useState({});
+  const notes = useStore($notes);
+  const loading = useStore($loadingNotes);
 
-  const onChange = (id, content) => {
-    updateLoading(setLoading(id));
-    return updateNote({ id, content }).then(
-      () => {
-        updateLoading(unsetLoading(id));
-        updateNotes(notes =>
-          notes.map(el => (el.id === id ? { ...el, content } : el))
-        );
-        return content;
-      },
-      () => updateLoading(unsetLoading(id))
-    );
-  };
-  const addNote = (_, content) => {
-    updateLoading(setLoading(newNoteId));
-
-    return createNote(content).then(
-      res => {
-        updateLoading(unsetLoading(newNoteId));
-
-        updateNotes(notes => notes.concat(res));
-        return "";
-      },
-      () => updateLoading(unsetLoading(newNoteId))
-    );
-  };
   useEffect(() => {
-    getNotes().then(next => updateNotes(next));
+    loadNotes().then(console.log);
   }, []);
   return (
     <Pane padding={24}>
-      <Note id={0} value="" save={addNote} loading={loading[newNoteId]} />
+      <Note />
+      <Note1
+        value=""
+        id={newNoteId}
+        save={addNote}
+        loading={loading[newNoteId]}
+      />
       {notes.map(note => (
-        <Note
+        <Note1
           key={note.id}
           id={note.id}
           loading={loading[note.id]}
           value={note.content}
-          save={onChange}
+          save={changeNote}
         />
       ))}
     </Pane>

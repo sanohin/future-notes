@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter } from "react-router-dom";
+import "./settings";
 import registerServiceWorker from "./registerServiceWorker";
 import { App } from "./App";
 

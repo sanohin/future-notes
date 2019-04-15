@@ -1,12 +1,12 @@
-import React, { Suspense } from "react";
+import React from "react";
 import { Route, Redirect } from "react-router-dom";
 import { useLoggedIn } from "./hooks";
 import { Spinner } from "evergreen-ui";
 
-const PrivateHandler = ({ component, ...rest }) => {
+const PrivateHandler = ({ disableSpinner, component, ...rest }) => {
   const [logged, loading] = useLoggedIn();
   if (loading) {
-    return <Spinner />;
+    return disableSpinner ? null : <Spinner />;
   }
   return logged ? (
     React.createElement(component, rest)
@@ -15,11 +15,22 @@ const PrivateHandler = ({ component, ...rest }) => {
   );
 };
 
-export const PrivateRoute = ({ component, render, ...routeProps }) => {
+export const PrivateRoute = ({
+  component,
+  disableSpinner,
+  render,
+  ...routeProps
+}) => {
   return (
     <Route
       {...routeProps}
-      render={props => <PrivateHandler {...props} component={component} />}
+      render={props => (
+        <PrivateHandler
+          disableSpinner={disableSpinner}
+          {...props}
+          component={component}
+        />
+      )}
     />
   );
 };

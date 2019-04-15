@@ -1,35 +1,61 @@
-/* globals firebase */
-import axios from "axios";
+import firebase from "firebase";
+import { docsToArray } from "./utils";
 
-export const axiosInstance = axios.create({});
+const auth = firebase.auth();
 
 export const signUp = (email, password) => {
-  return firebase.auth().createUserWithEmailAndPassword(email, password);
+  return auth.createUserWithEmailAndPassword(email, password);
 };
 
 export const logIn = (email, password) => {
-  return firebase.auth().signInWithEmailAndPassword(email, password);
+  return auth.signInWithEmailAndPassword(email, password);
+};
+
+export const googleLogIn = () => {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  return auth.signInWithPopup(provider);
 };
 
 export const logOut = () => {
-  return firebase.auth().signOut();
+  return auth.signOut();
 };
 
-export const validateMe = () =>
-  axiosInstance
-    .get("/api/users/me")
-    .then(({ data }) => data)
-    .catch(err => {
-      if (err.response.status === 401) {
-        return false;
-      }
-      return null;
+export const getNotes = () => {
+  return firebase
+    .firestore()
+    .collection("notex")
+    .where("userId", "==", auth.currentUser.uid)
+    .orderBy("timestamp", "desc")
+    .limit(10)
+    .get()
+    .then(docsToArray);
+};
+
+export const updateNote = ({ id, content }) => {
+  console.log({ id, content });
+  return firebase
+    .firestore()
+    .collection("notex")
+    .doc(id)
+    .update({
+      content,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
     });
+};
 
-export const getNotes = () => axiosInstance.get("/api/notes").then(r => r.data);
-
-export const updateNote = ({ id, content }) =>
-  axiosInstance.patch(`/api/notes/${id}`, { content });
-
-export const createNote = content =>
-  axiosInstance.post(`/api/notes`, { content }).then(res => res.data);
+export const createNote = content => {
+  return firebase
+    .firestore()
+    .collection("notex")
+    .add({
+      content,
+      userId: auth.currentUser.uid,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    })
+    .then(res => {
+      return { content, userId: auth.currentUser.uid, id: res.id };
+    })
+    .catch(e => {
+      console.log(e);
+    });
+};

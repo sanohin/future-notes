@@ -7,3 +7,11 @@ export const extractError = e => {
   }
   return `Error ${e.status}`;
 };
+
+export const docsToArray = querySnapshot => {
+  const result = [];
+  querySnapshot.forEach(doc => {
+    result.push({ id: doc.id, ...doc.data() });
+  });
+  return result;
+};

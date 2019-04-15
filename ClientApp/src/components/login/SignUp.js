@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { TextInputField, Button, Alert, Pane, Heading } from "evergreen-ui";
 import { Wrapper } from "./Wrapper";

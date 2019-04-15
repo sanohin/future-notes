@@ -1,5 +1,5 @@
-/* globals firebase */
 import React from "react";
+import firebase from "firebase";
 
 export const AuthContext = React.createContext(null);
 
@@ -8,7 +8,6 @@ export const AuthHandle = ({ children }) => {
   const [userState, update] = React.useState({ user: _user, loading: true });
   React.useEffect(() => {
     firebase.auth().onAuthStateChanged(next => {
-      console.log("userChange", next);
       update({
         user: next || null,
         loading: false
