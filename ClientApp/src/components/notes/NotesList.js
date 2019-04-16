@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from "react";
-import { Pane, Textarea, Button } from "evergreen-ui";
-import { createStore, createEvent, createEffect } from "effector";
-import { Editor, EditorState, RichUtils } from "draft-js";
+import "medium-draft/lib/index.css";
+import React, { useEffect } from "react";
+import { Pane, Button, Menu, Spinner } from "evergreen-ui";
+import { createStore, createEvent, createEffect, combine } from "effector";
 import { useStore } from "effector-react";
-import { getNotes, updateNote, createNote } from "../../api";
+import { Editor, createEditorState } from "medium-draft";
+import mediumDraftExporter from "medium-draft/lib/exporter";
+import * as api from "../../api";
 
 const $loadingNotes = createStore({});
+
 const setNoteLoading = createEvent();
 const setNoteFinished = createEvent();
 
@@ -20,97 +23,106 @@ $loadingNotes
   }));
 
 const $notes = createStore([]);
-const loadNotes = createEffect().use(() => getNotes());
-const addNote = createEffect().use(({ id, content }) => {
-  return createNote(content);
+
+const loadNotes = createEffect().use(() => api.getNotes());
+const createNote = createEffect().use(({ id, content }) => {
+  return api.createNote(content);
 });
 
-const changeNote = createEffect().use(updateNote);
+const updateNote = createEffect().use(api.updateNote);
 
-$notes.on(addNote.done, (state, { result }) => [result].concat(state));
+$notes.on(createNote.done, (state, { result }) => [result].concat(state));
 
-addNote.watch(x => setNoteLoading(x.id));
-addNote.done.watch(x => setNoteFinished(x.params.id));
-addNote.fail.watch(x => setNoteFinished(x.params.id));
+createNote.watch(x => setNoteLoading(x.id));
+createNote.done.watch(x => setNoteFinished(x.params.id));
+createNote.fail.watch(x => setNoteFinished(x.params.id));
 
-$notes.on(changeNote.done, (state, { params }) => {
+$notes.on(updateNote.done, (state, { params }) => {
   return state.map(el => (params.id === el.id ? params : el));
 });
 
-changeNote.watch(x => setNoteLoading(x.id));
-changeNote.done.watch(x => setNoteFinished(x.params.id));
-changeNote.fail.watch(x => setNoteFinished(x.params.id));
+updateNote.watch(x => setNoteLoading(x.id));
+updateNote.done.watch(x => setNoteFinished(x.params.id));
+updateNote.fail.watch(x => setNoteFinished(x.params.id));
 
 $notes.on(loadNotes.done, (_, { result }) => result);
 
-const Note1 = ({ value, id, save, loading }) => {
-  const [localText, changeText] = useState(value);
-  const hasDiff = value !== localText;
-  const onSave = e => {
-    e.preventDefault();
-    save({ id, content: localText });
-  };
-  return (
-    <Pane marginTop={24} display="flex">
-      <form style={{ display: "contents" }} onSubmit={onSave}>
-        <Textarea
-          value={localText}
-          placeholder="Enter text here"
-          onChange={e => changeText(e.target.value)}
-        />
-        <Pane width={100}>
-          {hasDiff && (
-            <Button isLoading={loading} type="submit" marginLeft={8}>
-              Save
-            </Button>
-          )}
-        </Pane>
-      </form>
-    </Pane>
-  );
-};
+const setSelectedNote = createEffect();
+const $selectedNoteId = createStore(null).on(setSelectedNote, (_, p) => p);
 
-function Note() {
-  const [editorState, changeState] = React.useState(EditorState.createEmpty);
-  const underline = () => {
-    changeState(RichUtils.toggleInlineStyle(editorState, "UNDERLINE"));
-  };
-  return (
-    <>
-      <button type="button" onClick={underline}>
-        _
-      </button>
-      <Editor editorState={editorState} onChange={changeState} />
-    </>
+loadNotes.done.watch(({ result }) => {
+  if (result[0] && !$selectedNoteId.getState()) {
+    setSelectedNote(result[0].id);
+  }
+});
+
+// const  combine($notes, $selectedNoteId, (notes, selectedId) => {
+//   if (!notes || !selectedId) {
+//     return null;
+//   }
+//   const el = notes.find(note => note.id === selectedId);
+//   return el || null;
+// });
+
+const getHtml = state => mediumDraftExporter(state.getCurrentContent());
+
+function SideList() {
+  const notes = useStore($notes);
+  const selected = useStore($selectedNoteId);
+  return notes.length ? (
+    <Menu>
+      {notes.map(el => {
+        const selectedProps =
+          selected === el.id ? { icon: "edit", color: "selected" } : undefined;
+        return (
+          <Menu.Item
+            key={el.id}
+            onSelect={() => setSelectedNote(el.id)}
+            {...selectedProps}
+          >
+            {el.content}
+          </Menu.Item>
+        );
+      })}
+    </Menu>
+  ) : (
+    <Spinner />
   );
 }
 
-const newNoteId = "new";
-export const NotesList = () => {
+function EditNote() {
   const notes = useStore($notes);
-  const loading = useStore($loadingNotes);
+  const selected = useStore($selectedNoteId);
+  const createState = () =>
+    createEditorState(notes.find(el => el.id === selected).content);
+  const [editorState, _onChange] = React.useState(createState);
+  const onChange = React.useCallback(s => _onChange(s), []);
+  const editorRef = React.createRef();
+  React.useEffect(() => {
+    editorRef.current.focus();
+  }, []);
 
+  return (
+    <Editor
+      ref={editorRef}
+      editorState={editorState}
+      onChange={onChange}
+      placeholder="Write your note..."
+    />
+  );
+}
+
+export const NotesList = () => {
   useEffect(() => {
     loadNotes().then(console.log);
   }, []);
+  const note = useStore($selectedNoteId);
   return (
-    <Pane padding={24}>
-      <Note />
-      <Note1
-        value=""
-        id={newNoteId}
-        save={addNote}
-        loading={loading[newNoteId]}
-      />
-      {notes.map(note => (
-        <Note1
-          key={note.id}
-          id={note.id}
-          loading={loading[note.id]}
-          value={note.content}
-          save={changeNote}
-        />
-      ))}
+    <Pane display="flex">
+      <Pane minWidth="200px" background="tint2" borderRadius={3}>
+        <SideList />
+      </Pane>
+      <Pane flex={1}>{note ? <EditNote key={note} /> : null}</Pane>
     </Pane>
   );
 };
