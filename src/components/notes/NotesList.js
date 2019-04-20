@@ -70,13 +70,13 @@ export const NotesList = () => {
   useEffect(() => {
     loadNotes();
   }, []);
-  const note = useStore($selectedNoteId);
+  const noteId = useStore($selectedNoteId);
   return (
     <Pane display="flex">
       <Pane minWidth="200px" background="tint2" borderRadius={3}>
         <SideList />
       </Pane>
-      <Pane flex={1}>{note ? <EditNote key={note.id} /> : null}</Pane>
+      <Pane flex={1}>{noteId ? <EditNote key={noteId} /> : null}</Pane>
     </Pane>
   );
 };
