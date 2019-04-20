@@ -1,5 +1,5 @@
 import React from "react";
-import { forward, step, blocks, createNode } from "effector";
+import { forward, step, blocks, createNode, createStoreObject } from "effector";
 import { SelectionState, EditorState, convertToRaw } from "draft-js";
 import { createEditorState } from "medium-draft";
 import mediumDraftImporter from "medium-draft/lib/importer";
@@ -33,6 +33,20 @@ export const getPreviewText = (content = "") => {
   const st = createInitialState(content);
   const str = st.getCurrentContent().getPlainText();
   return str;
+};
+
+export const addDevtools = stores => {
+  if (!("__REDUX_DEVTOOLS_EXTENSION__" in window)) {
+    return;
+  }
+  const devTools = window.__REDUX_DEVTOOLS_EXTENSION__.connect({});
+
+  const initalValue = Object.entries(stores).reduce((acc, [key, val]) => {
+    acc[key] = val.getState();
+    return acc;
+  }, {});
+  devTools.init(initalValue);
+  createStoreObject(stores).watch(n => devTools.send("change state", n));
 };
 
 const runSideEffect = step.run({

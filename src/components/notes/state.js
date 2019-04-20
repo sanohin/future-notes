@@ -8,13 +8,12 @@ import {
 import { from } from "rxjs";
 import { debounceTime } from "rxjs/operators";
 import * as api from "../../api";
-import { createInitialState, getHtml } from "./utils";
+import { createInitialState, getHtml, addDevtools } from "./utils";
 
 export const $notes = createStore({});
 export const $notesList = createStore([]);
 
 export const $selectedNoteId = createStore(null);
-
 export const $selectedNote = combine(
   $notes,
   $selectedNoteId,
@@ -23,18 +22,22 @@ export const $selectedNote = combine(
   }
 );
 
+const debugStores = { $notes, $notesList, $selectedNoteId, $selectedNote };
+addDevtools(debugStores);
+
 export const loadNotes = createEffect().use(() => api.getNotes());
-export const createNote = createEffect().use(() => {
-  const noteContent = "";
-  return api.createNote(noteContent);
-});
+export const createNote = createEffect().use(() => api.createNote(""));
 
 export const updateNoteState = createEvent();
 const createNoteState = createEvent();
 
-const updateNote = createEffect().use(r => {
-  api.updateNote(r);
+const updateNote = createEffect().use(r => api.updateNote(r));
+const _updateNoteStateWithId = updateNoteState.map(e => {
+  return { editorState: e, id: $selectedNoteId.getState() };
 });
+
+export const setSelectedNote = createEvent();
+const createdNoteId = createNote.done.map(({ result }) => result.id);
 
 $notes.on(createNote.done, (state, { result }) => ({
   ...state,
@@ -46,10 +49,6 @@ $notes.on(loadNotes.done, (_, { result }) => {
     acc[cur.id] = cur;
     return acc;
   }, {});
-});
-
-const _updateNoteStateWithId = updateNoteState.map(e => {
-  return { editorState: e, id: $selectedNoteId.getState() };
 });
 
 $notes.on(_updateNoteStateWithId, (st, { editorState, id }) => {
@@ -82,10 +81,7 @@ $notesList.on(loadNotes.done, (_, { result }) => {
   return result.map(i => i.id);
 });
 
-export const setSelectedNote = createEvent();
 $selectedNoteId.on(setSelectedNote, (_, p) => p);
-
-const createdNoteId = createNote.done.map(({ result }) => result.id);
 
 forward({
   from: createdNoteId,
