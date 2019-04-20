@@ -1,32 +1,45 @@
 import "medium-draft/lib/index.css";
 import React, { useEffect } from "react";
-import { Pane, Button, Menu, Spinner } from "evergreen-ui";
-import { createStore, createEvent, createEffect, combine } from "effector";
+import { Pane, Menu, Spinner } from "evergreen-ui";
 import { useStore } from "effector-react";
-import { Editor, createEditorState } from "medium-draft";
-import mediumDraftExporter from "medium-draft/lib/exporter";
-import { $notes, $selectedNote, setSelectedNote, loadNotes } from "./state";
-import { moveSelectionToEnd } from "./utils";
+import { Editor } from "medium-draft";
+import {
+  $notes,
+  $notesList,
+  $selectedNote,
+  setSelectedNote,
+  loadNotes,
+  createNote,
+  updateNoteState,
+  $selectedNoteId
+} from "./state";
+import { moveSelectionToEnd, getPreviewText, useMap } from "./utils";
 
-const getHtml = state => mediumDraftExporter(state.getCurrentContent());
+function NoteItem({ id, ...rest }) {
+  const current = useMap($notes, x => x[id]);
+  const onSelect = React.useCallback(() => setSelectedNote(id), [id]);
+  const preview = React.useMemo(() => getPreviewText(current.content), [
+    current.content
+  ]);
+  return (
+    <Menu.Item onSelect={onSelect} {...rest}>
+      {preview || "New note"}
+    </Menu.Item>
+  );
+}
 
 function SideList() {
-  const notes = useStore($notes);
-  const selected = useStore($selectedNote);
-  return notes.length ? (
+  const noteIds = useStore($notesList);
+  const selected = useStore($selectedNoteId);
+  return noteIds.length ? (
     <Menu>
-      {notes.map(el => {
+      <Menu.Item icon="plus" onSelect={createNote}>
+        Create a note
+      </Menu.Item>
+      {noteIds.map(el => {
         const selectedProps =
           selected === el ? { icon: "edit", color: "selected" } : undefined;
-        return (
-          <Menu.Item
-            key={el.id}
-            onSelect={() => setSelectedNote(el.id)}
-            {...selectedProps}
-          >
-            {el.content}
-          </Menu.Item>
-        );
+        return <NoteItem key={el} id={el} {...selectedProps} />;
       })}
     </Menu>
   ) : (
@@ -36,20 +49,17 @@ function SideList() {
 
 function EditNote() {
   const item = useStore($selectedNote);
-  const createState = () => createEditorState(item.content);
-  const [editorState, _onChange] = React.useState(createState);
-  const onChange = React.useCallback(s => _onChange(s), []);
   const editorRef = React.createRef();
   React.useEffect(() => {
     editorRef.current.focus();
-    onChange(moveSelectionToEnd(editorState));
+    updateNoteState(moveSelectionToEnd(item.editorState));
   }, []);
 
   return (
     <Editor
       ref={editorRef}
-      editorState={editorState}
-      onChange={onChange}
+      editorState={item.editorState}
+      onChange={updateNoteState}
       placeholder="Start writing your note..."
     />
   );

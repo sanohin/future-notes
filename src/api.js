@@ -34,7 +34,6 @@ export const getNotes = () => {
 };
 
 export const updateNote = ({ id, content }) => {
-  console.log({ id, content });
   return firebase
     .firestore()
     .collection("notex")
