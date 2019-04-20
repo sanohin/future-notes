@@ -89,8 +89,10 @@ const createdNoteId = createNote.done.map(({ result }) => result.id);
 
 forward({
   from: createdNoteId,
-  to: $selectedNoteId
+  to: setSelectedNote
 });
+
+$notesList.on(createdNoteId, (s, id) => [id].concat(s));
 
 forward({
   from: setSelectedNote,
@@ -100,5 +102,7 @@ forward({
 loadNotes.done.watch(({ result }) => {
   if (result[0] && !$selectedNoteId.getState()) {
     setSelectedNote(result[0].id);
+  } else {
+    createNote();
   }
 });

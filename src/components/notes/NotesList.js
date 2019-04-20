@@ -20,7 +20,7 @@ function NoteItem({ id, ...rest }) {
   const onSelect = React.useCallback(() => setSelectedNote(id), [id]);
   const preview = React.useMemo(() => getPreviewText(current.content), [
     current.content
-  ]);
+  ]).trim();
   return (
     <Menu.Item onSelect={onSelect} {...rest}>
       {preview || "New note"}
@@ -61,6 +61,7 @@ function EditNote() {
       editorState={item.editorState}
       onChange={updateNoteState}
       placeholder="Start writing your note..."
+      sideButtons={[]}
     />
   );
 }
@@ -69,7 +70,7 @@ export const NotesList = () => {
   useEffect(() => {
     loadNotes();
   }, []);
-  const note = useStore($selectedNote);
+  const note = useStore($selectedNoteId);
   return (
     <Pane display="flex">
       <Pane minWidth="200px" background="tint2" borderRadius={3}>
