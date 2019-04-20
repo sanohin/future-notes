@@ -26,6 +26,7 @@
   "scripts": {
     "start": "parcel public/index.html",
     "build": "parcel build public/index.html",
+    "postbuild": "cp dist/index.html dist/200.html",
     "lint": "eslint src/**/*.js",
     "test": "echo 'still no tests'"
   },
