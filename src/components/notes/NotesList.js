@@ -50,7 +50,7 @@ function EditNote() {
       ref={editorRef}
       editorState={editorState}
       onChange={onChange}
-      placeholder="Write your note..."
+      placeholder="Start writing your note..."
     />
   );
 }
