@@ -28,6 +28,8 @@ addDevtools(debugStores);
 export const loadNotes = createEffect().use(() => api.getNotes());
 export const createNote = createEffect().use(() => api.createNote(""));
 
+export const deleteNote = createEffect().use(id => api.removeNote(id));
+
 export const updateNoteState = createEvent();
 const createNoteState = createEvent();
 
@@ -77,11 +79,23 @@ $notes.on(createNoteState, (st, id) => {
   };
 });
 
+$notes.on(deleteNote.done, (st, { params }) => {
+  const { [params]: deletedItem, ...rest } = st;
+  return rest;
+});
+
 $notesList.on(loadNotes.done, (_, { result }) => {
   return result.map(i => i.id);
 });
 
 $selectedNoteId.on(setSelectedNote, (_, p) => p);
+
+$selectedNoteId.on($notesList, (item, list) => {
+  if (list.includes(item)) {
+    return item;
+  }
+  return list[0] || null;
+});
 
 forward({
   from: createdNoteId,
@@ -90,15 +104,17 @@ forward({
 
 $notesList.on(createdNoteId, (s, id) => [id].concat(s));
 
+$notesList.on(deleteNote.done, (s, { params }) =>
+  s.filter(el => el !== params)
+);
+
 forward({
-  from: setSelectedNote,
+  from: $selectedNoteId,
   to: createNoteState
 });
 
 loadNotes.done.watch(({ result }) => {
-  if (result[0] && !$selectedNoteId.getState()) {
-    setSelectedNote(result[0].id);
-  } else {
+  if (!result[0]) {
     createNote();
   }
 });

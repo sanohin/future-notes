@@ -4,3 +4,10 @@
   white-space: nowrap;
   width: 200px;
 }
+
+.deleteContainer {
+  display: flex;
+  justify-content: flex-end;
+  margin-right: 30px;
+  margin-top: 12px;
+}

@@ -33,6 +33,14 @@ export const getNotes = () => {
     .then(docsToArray);
 };
 
+export const removeNote = id => {
+  return firebase
+    .firestore()
+    .collection("notex")
+    .doc(id)
+    .delete();
+};
+
 export const updateNote = ({ id, content }) => {
   return firebase
     .firestore()

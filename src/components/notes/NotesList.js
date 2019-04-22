@@ -1,6 +1,6 @@
 import "medium-draft/lib/index.css";
 import React, { useEffect } from "react";
-import { Pane, Menu, Spinner, Text } from "evergreen-ui";
+import { Pane, Menu, Spinner, Text, IconButton } from "evergreen-ui";
 import { useStore } from "effector-react";
 import { Editor } from "medium-draft";
 import {
@@ -11,6 +11,7 @@ import {
   loadNotes,
   createNote,
   updateNoteState,
+  deleteNote,
   $selectedNoteId
 } from "./state";
 import { moveSelectionToEnd, getPreviewText, useMap } from "./utils";
@@ -65,14 +66,26 @@ function EditNote() {
     updateNoteState(moveSelectionToEnd(item.editorState));
   }, []);
 
+  const handleDelete = React.useCallback(() => deleteNote(item.id), [item.id]);
+
   return (
-    <Editor
-      ref={editorRef}
-      editorState={item.editorState}
-      onChange={updateNoteState}
-      placeholder="Start writing your note..."
-      sideButtons={[]}
-    />
+    <>
+      <div className={classes.deleteContainer}>
+        <IconButton
+          appearance="minimal"
+          intent="danger"
+          icon="trash"
+          onClick={handleDelete}
+        />
+      </div>
+      <Editor
+        ref={editorRef}
+        editorState={item.editorState}
+        onChange={updateNoteState}
+        placeholder="Start writing your note..."
+        sideButtons={[]}
+      />
+    </>
   );
 }
 
