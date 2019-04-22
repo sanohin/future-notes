@@ -13,7 +13,7 @@ export const Header = ({ avatarSize = 40 }) => {
     ? user.photoURL + "?sz=" + avatarSize * 1.5
     : undefined;
   return (
-    <Pane display="flex" justifyContent="flex-end">
+    <Pane display="flex" justifyContent="flex-end" margin="8px">
       <Popover
         content={
           <Pane>

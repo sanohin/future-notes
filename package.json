@@ -18,11 +18,11 @@
     "firebase": "^5.9.1",
     "medium-draft": "^0.5.12",
     "parcel": "^1.12.3",
+    "postcss-modules": "^1.4.1",
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
     "react-router-dom": "^4.2.2",
-    "rxjs": "^6.4.0",
-    "styled-components": "^4.0.2"
+    "rxjs": "^6.4.0"
   },
   "scripts": {
     "start": "parcel public/index.html",

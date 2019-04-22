@@ -1,6 +1,6 @@
 import "medium-draft/lib/index.css";
 import React, { useEffect } from "react";
-import { Pane, Menu, Spinner } from "evergreen-ui";
+import { Pane, Menu, Spinner, Text } from "evergreen-ui";
 import { useStore } from "effector-react";
 import { Editor } from "medium-draft";
 import {
@@ -14,16 +14,24 @@ import {
   $selectedNoteId
 } from "./state";
 import { moveSelectionToEnd, getPreviewText, useMap } from "./utils";
+import classes from "./styles.css";
 
 function NoteItem({ id, ...rest }) {
   const current = useMap($notes, x => x[id]);
   const onSelect = React.useCallback(() => setSelectedNote(id), [id]);
-  const preview = React.useMemo(() => getPreviewText(current.content), [
-    current.content
-  ]).trim();
+  const preview = React.useMemo(() => {
+    const firstLine = getPreviewText(current.content).split("\n")[0] || "";
+    return firstLine
+      .split(" ")
+      .slice(0, 4)
+      .join(" ")
+      .trim();
+  }, [current.content]);
   return (
     <Menu.Item onSelect={onSelect} {...rest}>
-      {preview || "New note"}
+      <Text color={!preview ? "muted" : "black"}>
+        <div className={classes.noteText}>{preview || "Untitled"}</div>
+      </Text>
     </Menu.Item>
   );
 }
@@ -33,14 +41,16 @@ function SideList() {
   const selected = useStore($selectedNoteId);
   return noteIds.length ? (
     <Menu>
-      <Menu.Item icon="plus" onSelect={createNote}>
-        Create a note
-      </Menu.Item>
-      {noteIds.map(el => {
-        const selectedProps =
-          selected === el ? { icon: "edit", color: "selected" } : undefined;
-        return <NoteItem key={el} id={el} {...selectedProps} />;
-      })}
+      <div>
+        <Menu.Item icon="plus" onSelect={createNote}>
+          Create a note
+        </Menu.Item>
+        {noteIds.map(el => {
+          const selectedProps =
+            selected === el ? { icon: "edit", color: "selected" } : undefined;
+          return <NoteItem key={el} id={el} {...selectedProps} />;
+        })}
+      </div>
     </Menu>
   ) : (
     <Spinner />
