@@ -42,7 +42,7 @@ function SideList() {
   const selected = useStore($selectedNoteId);
   return noteIds.length ? (
     <Menu>
-      <div>
+      <div className={classes.notesList}>
         <Menu.Item icon="plus" onSelect={createNote}>
           Create a note
         </Menu.Item>
@@ -95,11 +95,13 @@ export const NotesList = () => {
   }, []);
   const noteId = useStore($selectedNoteId);
   return (
-    <Pane display="flex">
+    <div className={classes.appContainer}>
       <Pane minWidth="200px" background="tint2" borderRadius={3}>
         <SideList />
       </Pane>
-      <Pane flex={1}>{noteId ? <EditNote key={noteId} /> : null}</Pane>
-    </Pane>
+      <div className={classes.noteContainer}>
+        {noteId ? <EditNote key={noteId} /> : null}
+      </div>
+    </div>
   );
 };

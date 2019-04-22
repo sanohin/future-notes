@@ -4,7 +4,6 @@ import { Login, SignUp } from "./components/login";
 import { NotesList } from "./components/notes";
 import { Header } from "./components/header";
 import { PrivateRoute, AuthHandle, NotLoggedInRoute } from "./components/auth";
-import "./app.css";
 
 export const App = () => {
   return (

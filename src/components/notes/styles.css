@@ -11,3 +11,16 @@
   margin-right: 30px;
   margin-top: 12px;
 }
+
+.notesList {
+  height: 100%;
+}
+
+.appContainer {
+  display: flex;
+  height: 100%;
+}
+
+.noteContainer {
+  flex: 1;
+}
