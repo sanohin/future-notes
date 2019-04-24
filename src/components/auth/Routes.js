@@ -1,25 +1,35 @@
-import React from "react";
+// @flow
+import * as React from "react";
 import { Route, Redirect } from "react-router-dom";
-import { useLoggedIn } from "./hooks";
 import { Spinner } from "evergreen-ui";
+import { useStore } from "effector-react";
+import { combine } from "effector";
+import { $currentUser, $userLoading } from "./state";
+
+const $userWithLoading = combine(
+  $currentUser,
+  $userLoading,
+  (user, loading) => ({
+    user,
+    loading
+  })
+);
 
 const PrivateHandler = ({ disableSpinner, component, ...rest }) => {
-  const [logged, loading] = useLoggedIn();
+  const { loading, user } = useStore($userWithLoading);
   if (loading) {
     return disableSpinner ? null : <Spinner />;
   }
-  return logged ? (
-    React.createElement(component, rest)
-  ) : (
-    <Redirect to="/login" />
-  );
+  return user ? React.createElement(component, rest) : <Redirect to="/login" />;
 };
 
 export const PrivateRoute = ({
   component,
   disableSpinner,
-  render,
   ...routeProps
+}: {
+  disableSpinner?: boolean,
+  component: React.ComponentType<any>
 }) => {
   return (
     <Route
@@ -36,14 +46,21 @@ export const PrivateRoute = ({
 };
 
 const PublicHandler = ({ component, ...rest }) => {
-  const [logged, loading] = useLoggedIn();
+  const { user, loading } = useStore($userWithLoading);
   if (loading) {
     return <Spinner />;
+  } else if (!user) {
+    return React.createElement(component, rest);
   }
-  return !logged ? React.createElement(component, rest) : <Redirect to="/" />;
+  return <Redirect to="/" />;
 };
 
-export const NotLoggedInRoute = ({ component, render, ...routeProps }) => {
+export const NotLoggedInRoute = ({
+  component,
+  ...routeProps
+}: {
+  component: React.ComponentType<any>
+}) => {
   return (
     <Route
       {...routeProps}

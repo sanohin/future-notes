@@ -1,10 +1,12 @@
+// @flow
 import React, { useContext } from "react";
+import { useStore } from "effector-react";
 import { Avatar, Pane, Popover, Menu } from "evergreen-ui";
-import { AuthContext } from "../auth";
+import { $currentUser } from "../auth";
 import { logOut } from "../../api";
 
-export const Header = ({ avatarSize = 40 }) => {
-  const { user } = useContext(AuthContext);
+export const Header = ({ avatarSize = 40 }: { avatarSize?: number }) => {
+  const user = useStore($currentUser);
   if (!user) {
     return null;
   }
