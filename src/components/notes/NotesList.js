@@ -1,20 +1,11 @@
+// @flow
 import "medium-draft/lib/index.css";
-import React, { useEffect } from "react";
-import { Pane, Menu, Spinner, Text, IconButton } from "evergreen-ui";
+import React from "react";
+import { Menu, Spinner, Text, IconButton } from "evergreen-ui";
 import { useStore } from "effector-react";
-import { Editor } from "medium-draft";
-import {
-  $notes,
-  $notesList,
-  $selectedNote,
-  setSelectedNote,
-  loadNotes,
-  createNote,
-  updateNoteState,
-  deleteNote,
-  $selectedNoteId
-} from "./state";
-import { moveSelectionToEnd, getPreviewText, useMap } from "./utils";
+import { $notes, $notesList, $selectedNoteId } from "./state";
+import { setSelectedNote, createNote } from "./state";
+import { getPreviewText, useMap } from "./utils";
 import classes from "./styles.css";
 
 function NoteItem({ id, ...rest }) {
@@ -37,7 +28,7 @@ function NoteItem({ id, ...rest }) {
   );
 }
 
-function SideList() {
+export function NotesList() {
   const noteIds = useStore($notesList);
   const selected = useStore($selectedNoteId);
   return noteIds.length ? (
@@ -57,51 +48,3 @@ function SideList() {
     <Spinner />
   );
 }
-
-function EditNote() {
-  const item = useStore($selectedNote);
-  const editorRef = React.createRef();
-  React.useEffect(() => {
-    editorRef.current.focus();
-    updateNoteState(moveSelectionToEnd(item.editorState));
-  }, []);
-
-  const handleDelete = React.useCallback(() => deleteNote(item.id), [item.id]);
-
-  return (
-    <>
-      <div className={classes.deleteContainer}>
-        <IconButton
-          appearance="minimal"
-          intent="danger"
-          icon="trash"
-          onClick={handleDelete}
-        />
-      </div>
-      <Editor
-        ref={editorRef}
-        editorState={item.editorState}
-        onChange={updateNoteState}
-        placeholder="Start writing your note..."
-        sideButtons={[]}
-      />
-    </>
-  );
-}
-
-export const NotesList = () => {
-  useEffect(() => {
-    loadNotes();
-  }, []);
-  const noteId = useStore($selectedNoteId);
-  return (
-    <div className={classes.appContainer}>
-      <Pane minWidth="200px" background="tint2" borderRadius={3}>
-        <SideList />
-      </Pane>
-      <div className={classes.noteContainer}>
-        {noteId ? <EditNote key={noteId} /> : null}
-      </div>
-    </div>
-  );
-};
