@@ -5,11 +5,11 @@ import { useStore } from "effector-react";
 import { Editor } from "medium-draft";
 import { IconButton } from "evergreen-ui";
 import { $selectedNote } from "./state";
-import { updateNoteState, deleteNote } from "./state";
+import { updateNoteState, deleteNote } from "./workflow";
 import { moveSelectionToEnd } from "./utils";
+import type { Note } from "../../types";
 
-export function EditNote() {
-  const item = useStore($selectedNote);
+export function EditNote({ item }: { item: Note }) {
   const editorRef = React.createRef();
   React.useEffect(() => {
     if (editorRef.current) {

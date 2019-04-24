@@ -4,21 +4,21 @@ import React from "react";
 import { Menu, Spinner, Text, IconButton } from "evergreen-ui";
 import { useStore } from "effector-react";
 import { $notes, $notesList, $selectedNoteId } from "./state";
-import { setSelectedNote, createNote } from "./state";
+import { setSelectedNote, createNote } from "./workflow";
 import { getPreviewText, useMap } from "./utils";
 import classes from "./styles.css";
 
 function NoteItem({ id, ...rest }) {
-  const current = useMap($notes, x => x[id]);
+  const content = useMap($notes, x => x[id].content);
   const onSelect = React.useCallback(() => setSelectedNote(id), [id]);
   const preview = React.useMemo(() => {
-    const firstLine = getPreviewText(current.content).split("\n")[0] || "";
+    const firstLine = getPreviewText(content).split("\n")[0] || "";
     return firstLine
       .split(" ")
       .slice(0, 4)
       .join(" ")
       .trim();
-  }, [current.content]);
+  }, [content]);
   return (
     <Menu.Item onSelect={onSelect} {...rest}>
       <Text color={!preview ? "muted" : "black"}>
