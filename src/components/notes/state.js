@@ -7,7 +7,7 @@ import {
   forward
 } from "effector";
 import type { Store } from "effector";
-import { addDevtools } from "./utils";
+import { addDevtools, createInitialState } from "./utils";
 import type { Note } from "../../types";
 
 export const $notes = createStore<{ [id: string]: Note }>({});
@@ -24,6 +24,8 @@ export const $selectedNote: Store<Note | null> = combine(
     return null;
   }
 );
+
+export const $editorState = createStore<any>(createInitialState());
 
 const debugStores = { $notes, $notesList, $selectedNoteId, $selectedNote };
 addDevtools(debugStores);

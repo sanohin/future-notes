@@ -4,17 +4,19 @@ import classes from "./styles.css";
 import { useStore } from "effector-react";
 import { Editor } from "medium-draft";
 import { IconButton } from "evergreen-ui";
-import { $selectedNote } from "./state";
+import { $editorState } from "./state";
 import { updateNoteState, deleteNote } from "./workflow";
 import { moveSelectionToEnd } from "./utils";
 import type { Note } from "../../types";
+import "medium-draft/lib/index.css";
 
 export function EditNote({ item }: { item: Note }) {
   const editorRef = React.createRef();
+  const editorState = useStore($editorState);
   React.useEffect(() => {
     if (editorRef.current) {
       editorRef.current.focus();
-      updateNoteState(moveSelectionToEnd(item.editorState));
+      updateNoteState(moveSelectionToEnd(editorState));
     }
   }, []);
 
@@ -32,7 +34,7 @@ export function EditNote({ item }: { item: Note }) {
       </div>
       <Editor
         ref={editorRef}
-        editorState={item.editorState}
+        editorState={editorState}
         onChange={updateNoteState}
         placeholder="Start writing your note..."
         sideButtons={[]}

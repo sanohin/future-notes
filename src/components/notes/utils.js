@@ -29,10 +29,14 @@ export const createInitialState = (content = "") => {
   return createEditorState(convertToRaw(mediumDraftImporter(content)));
 };
 
-export const getPreviewText = (content = "") => {
-  const st = createInitialState(content);
-  const str = st.getCurrentContent().getPlainText();
-  return str;
+export const getPreviewText = state => {
+  const text = state.getCurrentContent().getPlainText();
+  const firstLine = text.split("\n")[0] || "";
+  return firstLine
+    .split(" ")
+    .slice(0, 4)
+    .join(" ")
+    .trim();
 };
 
 export const addDevtools = stores => {

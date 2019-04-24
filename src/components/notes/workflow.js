@@ -3,14 +3,24 @@ import { forward, createEffect, createEvent } from "effector";
 import { from } from "rxjs";
 import { debounceTime } from "rxjs/operators";
 import * as api from "../../api";
-import { createInitialState, getHtml } from "./utils";
-import { $notes, $notesList, $selectedNote, $selectedNoteId } from "./state";
+import { createInitialState, getHtml, getPreviewText } from "./utils";
+import {
+  $notes,
+  $notesList,
+  $selectedNote,
+  $selectedNoteId,
+  $editorState
+} from "./state";
 import type { Note } from "../../types";
 
 export const loadNotes = createEffect<void, Array<Note>, any>();
 export const createNote = createEffect<void, Note, any>();
 export const deleteNote = createEffect<string, void, any>();
-const updateNote = createEffect<{ id: string, content: string }, void, any>();
+const updateNote = createEffect<
+  { id: string, content: string, editorState: any },
+  void,
+  any
+>();
 
 export const setSelectedNote = createEvent<string>();
 export const updateNoteState = createEvent<any>();
@@ -21,12 +31,13 @@ createNote.use(() => api.createNote(""));
 deleteNote.use(id => api.removeNote(id));
 updateNote.use(r => api.updateNote(r));
 
-const _updateNoteStateWithId = updateNoteState.map(e => {
+// helper action to save the note
+const _updateNoteStateWithId = updateNoteState.map(editorState => {
   const currentId = $selectedNoteId.getState();
   if (!currentId) {
     throw new Error("$selectedNoteId is null during update.");
   }
-  return { editorState: e, id: currentId };
+  return { editorState, id: currentId };
 });
 
 const createdNoteId = createNote.done.map(({ result }) => result.id);
@@ -38,39 +49,41 @@ $notes.on(createNote.done, (state, { result }) => ({
 
 $notes.on(loadNotes.done, (_, { result }) => {
   return result.reduce((acc, cur) => {
-    acc[cur.id] = cur;
+    acc[cur.id] = {
+      ...cur,
+      preview: getPreviewText(createInitialState(cur.content))
+    };
     return acc;
   }, {});
 });
 
-$notes.on(_updateNoteStateWithId, (st, { editorState, id }) => {
-  return { ...st, [id]: { ...st[id], editorState } };
+forward({
+  from: updateNoteState,
+  to: $editorState
+});
+
+$editorState.on(createNoteState, (st, id) => {
+  if (!id) {
+    return st;
+  }
+  const note = $notes.getState()[id];
+  return createInitialState(note.content);
 });
 
 $notes.on(updateNote.done, (st, { params }) => {
-  return { ...st, [params.id]: { ...st[params.id], content: params.content } };
+  const preview = getPreviewText(params.editorState);
+  return {
+    ...st,
+    [params.id]: { ...st[params.id], content: params.content, preview }
+  };
 });
 
 from(_updateNoteStateWithId)
   .pipe(debounceTime(500))
   .subscribe(({ id, editorState }) => {
     const content = getHtml(editorState);
-    updateNote({ id, content });
+    updateNote({ id, content, editorState });
   });
-
-$notes.on(createNoteState, (st, id) => {
-  if (!id) {
-    return st;
-  }
-  const note = st[id];
-  if (note.editorState) {
-    return st;
-  }
-  return {
-    ...st,
-    [id]: { ...st[id], editorState: createInitialState(note.content) }
-  };
-});
 
 $notes.on(deleteNote.done, (st, { params }) => {
   const { [params]: deletedItem, ...rest } = st;
