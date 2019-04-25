@@ -1,21 +1,21 @@
 // @flow
 import React from "react";
-import { Menu, Spinner, Text, IconButton } from "evergreen-ui";
 import { useStore } from "effector-react";
+import { MenuItem, Text, Ellipsis, Spinner } from "../ui";
 import { $notes, $notesList, $selectedNoteId } from "./state";
 import { setSelectedNote, createNote } from "./workflow";
 import { useMap } from "./utils";
-import classes from "./styles.css";
+import { NoteText } from "./styled";
 
 function NoteItem({ id, ...rest }) {
   const preview = useMap($notes, x => x[id].preview);
-  const onSelect = React.useCallback(() => setSelectedNote(id), [id]);
+  const onClick = React.useCallback(() => setSelectedNote(id), [id]);
   return (
-    <Menu.Item onSelect={onSelect} {...rest}>
+    <MenuItem onClick={onClick} {...rest}>
       <Text color={!preview ? "muted" : "black"}>
-        <div className={classes.noteText}>{preview || "Untitled"}</div>
+        <Ellipsis>{preview || "Untitled"}</Ellipsis>
       </Text>
-    </Menu.Item>
+    </MenuItem>
   );
 }
 
@@ -23,18 +23,14 @@ export function NotesList() {
   const noteIds = useStore($notesList);
   const selected = useStore($selectedNoteId);
   return noteIds.length ? (
-    <Menu>
-      <div className={classes.notesList}>
-        <Menu.Item icon="plus" onSelect={createNote}>
-          Create a note
-        </Menu.Item>
-        {noteIds.map(el => {
-          const selectedProps =
-            selected === el ? { icon: "edit", color: "selected" } : undefined;
-          return <NoteItem key={el} id={el} {...selectedProps} />;
-        })}
-      </div>
-    </Menu>
+    <>
+      <MenuItem onClick={createNote}>Create a note</MenuItem>
+      <hr />
+      {noteIds.map(el => {
+        const isSelected = selected === el;
+        return <NoteItem selected={isSelected} key={el} id={el} />;
+      })}
+    </>
   ) : (
     <Spinner />
   );

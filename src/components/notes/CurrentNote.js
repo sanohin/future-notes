@@ -1,13 +1,13 @@
 // @flow
 import React from "react";
-import classes from "./styles.css";
 import { useStore } from "effector-react";
 import { Editor } from "medium-draft";
-import { IconButton } from "evergreen-ui";
+import { Button } from "../ui";
 import { $editorState } from "./state";
 import { updateNoteState, deleteNote } from "./workflow";
 import { moveSelectionToEnd } from "./utils";
 import type { Note } from "../../types";
+import { DeleteContainer } from "./styled";
 import "medium-draft/lib/index.css";
 
 export function EditNote({ item }: { item: Note }) {
@@ -24,14 +24,9 @@ export function EditNote({ item }: { item: Note }) {
 
   return (
     <>
-      <div className={classes.deleteContainer}>
-        <IconButton
-          appearance="minimal"
-          intent="danger"
-          icon="trash"
-          onClick={handleDelete}
-        />
-      </div>
+      <DeleteContainer>
+        <Button onClick={handleDelete}>Delete</Button>
+      </DeleteContainer>
       <Editor
         ref={editorRef}
         editorState={editorState}

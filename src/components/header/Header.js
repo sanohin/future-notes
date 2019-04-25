@@ -1,42 +1,43 @@
 // @flow
-import React, { useContext } from "react";
+import React from "react";
 import { useStore } from "effector-react";
-import { Avatar, Pane, Popover, Menu } from "evergreen-ui";
+import Popover from "react-tiny-popover";
 import { $currentUser } from "../auth";
+import { HeaderContainer, popoverContainer } from "./styled";
 import { logOut } from "../../api";
+import { Avatar, MenuItem } from "../ui";
 
-export const Header = ({ avatarSize = 40 }: { avatarSize?: number }) => {
+export function Header({ avatarSize = 40 }: { avatarSize?: number }) {
+  const [isOpen, setOpen] = React.useState(false);
   const user = useStore($currentUser);
+  const close = React.useCallback(() => setOpen(false), []);
+  const open = React.useCallback(() => setOpen(true), []);
   if (!user) {
     return null;
   }
+
   const name = user.displayName || user.email;
   const img = user.photoURL
     ? user.photoURL + "?sz=" + avatarSize * 1.5
     : undefined;
+
   return (
-    <Pane display="flex" justifyContent="flex-end" margin="8px">
+    <HeaderContainer>
       <Popover
+        isOpen={isOpen}
+        position="bottom"
+        onClickOutside={close}
+        containerClassName={popoverContainer}
         content={
-          <Pane>
-            <Menu>
-              <Menu.Group>
-                <Menu.Item>Share...</Menu.Item>
-                <Menu.Item>Move...</Menu.Item>
-                <Menu.Item>Rename...</Menu.Item>
-              </Menu.Group>
-              <Menu.Divider />
-              <Menu.Group>
-                <Menu.Item intent="danger" onSelect={logOut}>
-                  Log out ({user.email})
-                </Menu.Item>
-              </Menu.Group>
-            </Menu>
-          </Pane>
+          <div>
+            <MenuItem intent="danger" onClick={logOut}>
+              Log out ({user.email})
+            </MenuItem>
+          </div>
         }
       >
-        <Avatar src={img} name={name} isSolid size={avatarSize} />
+        <Avatar onClick={open} src={img} name={name} size={avatarSize} />
       </Popover>
-    </Pane>
+    </HeaderContainer>
   );
-};
+}

@@ -1,10 +1,10 @@
 // @flow
 import * as React from "react";
 import { Route, Redirect } from "react-router-dom";
-import { Spinner } from "evergreen-ui";
 import { useStore } from "effector-react";
 import { combine } from "effector";
 import { $currentUser, $userLoading } from "./state";
+import { Spinner } from "../ui/Spinner";
 
 const $userWithLoading = combine(
   $currentUser,
