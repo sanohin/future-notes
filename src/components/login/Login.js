@@ -1,22 +1,30 @@
+// @flow
 import React, { useState, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { TextInputField, Button, Alert, Pane, Heading } from "evergreen-ui";
-import { Wrapper } from "./Wrapper";
-import { logIn, googleLogIn } from "../../api";
-import { Google } from "../ui/icons";
+import { logIn, signUp, googleLogIn } from "../../api";
+import { FieldsWrapper, ButtonsWrapper, FormWrapper } from "./styled";
+import { Button, Alert, Heading, Input, Label } from "../ui";
 
-export const Login = () => {
+export function Login() {
   const [loading, setLoading] = useState(false);
 
   const [email, changeEmail] = useState("");
   const [pass, changePass] = useState("");
   const [error, setError] = useState("");
+
+  const isSignIn = React.useRef(true);
+
+  const onSingInClick = useCallback(() => (isSignIn.current = true), []);
+  const onSingUpClick = useCallback(() => (isSignIn.current = false), []);
+
   const login = useCallback(
     e => {
       e.preventDefault();
+      const signIn = isSignIn.current;
+      const method = signIn ? logIn : signUp;
       setError("");
       setLoading(true);
-      logIn(email, pass)
+      method(email, pass)
         .catch(e => {
           setError(e.message);
         })
@@ -24,59 +32,52 @@ export const Login = () => {
           setLoading(false);
         });
     },
-    [setError, setLoading]
+    [email, pass]
   );
 
+  const disabled = !pass || !email;
   return (
-    <Wrapper>
-      <Heading size={700}>Log in</Heading>
-      <Pane marginTop={16}>
-        <form onSubmit={login}>
-          <TextInputField
-            required
-            autoFocus
-            value={email}
-            onChange={e => changeEmail(e.target.value)}
-            name="email"
-            label="Email"
-            type="email"
-            placeholder="Enter email"
-          />
-          <TextInputField
-            required
-            value={pass}
-            onChange={e => changePass(e.target.value)}
-            type="password"
-            name="password"
-            label="Password"
-            placeholder="Enter password"
-          />
-          {error && <Alert intent="danger" title={error} marginBottom={16} />}
-          <Button
-            type="submit"
-            iconAfter="arrow-right"
-            appearance="primary"
-            isLoading={loading}
-            disabled={!pass || !email}
-          >
-            Login
+    <FormWrapper>
+      <Heading>Log in</Heading>
+      <form onSubmit={login}>
+        <FieldsWrapper>
+          <Label>
+            Email
+            <Input
+              required
+              autoFocus
+              value={email}
+              onChange={e => changeEmail(e.target.value)}
+              name="email"
+              type="email"
+              placeholder="Enter email"
+            />
+          </Label>
+          <Label>
+            Password
+            <Input
+              required
+              value={pass}
+              onChange={e => changePass(e.target.value)}
+              type="password"
+              name="password"
+              placeholder="Enter password"
+            />
+          </Label>
+          {error && <Alert>{error}</Alert>}
+        </FieldsWrapper>
+        <ButtonsWrapper>
+          <Button type="submit" onClick={onSingInClick} disabled={disabled}>
+            Log in
           </Button>
-          <Link to="/sign-up">
-            <Button
-              type="button"
-              appearance="primary"
-              marginLeft={12}
-              intent="success"
-              iconBefore="add"
-            >
-              Sign up
-            </Button>
-          </Link>
-          <Button marginLeft={12} onClick={googleLogIn}>
-            <Google width={24} height={24} />
+          <Button type="submit" onClick={onSingUpClick} disabled={disabled}>
+            Sign up
           </Button>
-        </form>
-      </Pane>
-    </Wrapper>
+          <Button type="button" onClick={googleLogIn}>
+            Log in with Google
+          </Button>
+        </ButtonsWrapper>
+      </form>
+    </FormWrapper>
   );
-};
+}

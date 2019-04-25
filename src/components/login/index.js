@@ -1,2 +1,1 @@
-export * from "./Login";
-export * from "./SignUp";
+export { Login as default } from "./Login";
