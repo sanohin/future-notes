@@ -8,6 +8,8 @@
     "@babel/preset-env": "^7.4.3",
     "@babel/preset-flow": "^7.0.0",
     "@babel/preset-react": "^7.0.0",
+    "@effector/babel-plugin": "^0.0.3",
+    "@effector/babel-plugin-react": "^0.0.3",
     "babel-eslint": "^10.0.1",
     "babel-loader": "^8.0.5",
     "css-loader": "^2.1.1",

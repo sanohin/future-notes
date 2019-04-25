@@ -814,6 +814,16 @@
     classnames "^2.2"
     tslib "^1.9.0"
 
+"@effector/babel-plugin-react@^0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@effector/babel-plugin-react/-/babel-plugin-react-0.0.3.tgz#a71df9dbb6a2f4e1a6cb4ddf105efb076783a5a8"
+  integrity sha512-56TQtXq8VoOxM9xegAaj7l0pFE4qsAwfxaDjaIADe5HEV+3rqTnVR2VbtVtj/O4ywDJlhTFDl2Heo2V2D4F5og==
+
+"@effector/babel-plugin@^0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@effector/babel-plugin/-/babel-plugin-0.0.3.tgz#5c7eb8cb58e3492aa2ea93d904c17fe8acf64a6a"
+  integrity sha512-d95l7VgINJhq9o2hTcaqK6hf48Kn+1JfcegdJYjVJt98SjPhlBbEn3bayCMmMsIHHCqSlbRR0Hr+vzi6sZoq3A==
+
 "@emotion/hash@^0.6.5":
   version "0.6.6"
   resolved "https://registry.yarnpkg.com/@emotion/hash/-/hash-0.6.6.tgz#62266c5f0eac6941fece302abad69f2ee7e25e44"
