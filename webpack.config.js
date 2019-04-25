@@ -17,7 +17,15 @@ module.exports = {
         test: /\.m?js$/,
         exclude: /(node_modules)/,
         include: [path.resolve(__dirname, "src")],
-        use: "babel-loader"
+        use: [
+          "babel-loader",
+          {
+            loader: "linaria/loader",
+            options: {
+              sourceMap: PROD
+            }
+          }
+        ]
       },
       {
         test: /\.css$/,
@@ -54,6 +62,7 @@ module.exports = {
   },
   devServer: {
     contentBase: path.join(__dirname, "dist"),
+    historyApiFallback: true,
     port: 1234
   }
 };

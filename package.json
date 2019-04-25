@@ -23,6 +23,7 @@
     "evergreen-ui": "^4.15.0",
     "firebase": "^5.9.1",
     "html-webpack-plugin": "^3.2.0",
+    "linaria": "^1.3.1",
     "medium-draft": "^0.5.12",
     "postcss-modules": "^1.4.1",
     "react": "^16.8.4",
