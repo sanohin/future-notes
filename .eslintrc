@@ -19,5 +19,13 @@
   },
   "globals": {
     "process": true
-  }
+  },
+  "overrides": [
+    {
+      "files": ["webpack.config.js"],
+      "env": {
+        "node": true
+      }
+    }
+  ]
 }

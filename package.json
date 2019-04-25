@@ -4,10 +4,13 @@
   "private": true,
   "dependencies": {
     "@babel/core": "^7.4.3",
+    "@babel/plugin-syntax-dynamic-import": "^7.2.0",
     "@babel/preset-env": "^7.4.3",
     "@babel/preset-flow": "^7.0.0",
     "@babel/preset-react": "^7.0.0",
     "babel-eslint": "^10.0.1",
+    "babel-loader": "^8.0.5",
+    "css-loader": "^2.1.1",
     "draft-convert": "^2.1.4",
     "draft-js": "^0.10.5",
     "effector": "^0.18.6",
@@ -17,17 +20,21 @@
     "eslint-plugin-react-hooks": "^1.6.0",
     "evergreen-ui": "^4.15.0",
     "firebase": "^5.9.1",
+    "html-webpack-plugin": "^3.2.0",
     "medium-draft": "^0.5.12",
-    "parcel": "^1.12.3",
     "postcss-modules": "^1.4.1",
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
     "react-router-dom": "^4.2.2",
-    "rxjs": "^6.4.0"
+    "rxjs": "^6.4.0",
+    "style-loader": "^0.23.1",
+    "terser-webpack-plugin": "^1.2.3",
+    "webpack": "^4.30.0",
+    "webpack-cli": "^3.3.1"
   },
   "scripts": {
-    "start": "parcel public/index.html",
-    "build": "parcel build public/index.html",
+    "start": "webpack-dev-server",
+    "build": "export NODE_ENV=production && webpack",
     "postbuild": "cp dist/index.html dist/200.html",
     "lint": "eslint src/**/*.js",
     "test": "echo 'still no tests'"
@@ -36,6 +43,7 @@
     "last 2 versions"
   ],
   "devDependencies": {
-    "surge": "^0.20.3"
+    "surge": "^0.20.3",
+    "webpack-dev-server": "^3.3.1"
   }
 }
