@@ -1,14 +1,15 @@
 // @flow
 import React from "react";
 import { useStore } from "effector-react";
-import { MenuItem, Text, Ellipsis, Spinner } from "../ui";
+import { MenuItem, Text, Ellipsis } from "../ui";
 import { $notes, $notesList, $selectedNoteId } from "./state";
 import { setSelectedNote, createNote } from "./workflow";
 import { useMap } from "./utils";
 import { NoteText } from "./styled";
 
-function NoteItem({ id, ...rest }) {
-  const preview = useMap($notes, x => x[id].preview);
+function NoteItem({ id, ...rest }: { id: string }) {
+  // not happy with it at all
+  const preview = useMap($notes, x => (x[id] ? x[id].preview : ""));
   const onClick = React.useCallback(() => setSelectedNote(id), [id]);
   return (
     <MenuItem onClick={onClick} {...rest}>
@@ -22,7 +23,7 @@ function NoteItem({ id, ...rest }) {
 export function NotesList() {
   const noteIds = useStore($notesList);
   const selected = useStore($selectedNoteId);
-  return noteIds.length ? (
+  return (
     <>
       <MenuItem onClick={createNote}>Create a note</MenuItem>
       <hr />
@@ -31,7 +32,5 @@ export function NotesList() {
         return <NoteItem selected={isSelected} key={el} id={el} />;
       })}
     </>
-  ) : (
-    <Spinner />
   );
 }

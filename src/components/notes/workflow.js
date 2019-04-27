@@ -124,3 +124,9 @@ loadNotes.done.watch(({ result }) => {
     createNote();
   }
 });
+
+const subscription = $notesList.watch(r => {
+  if (subscription && !r.length) {
+    createNote();
+  }
+});
